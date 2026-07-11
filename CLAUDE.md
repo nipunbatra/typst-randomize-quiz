@@ -47,5 +47,11 @@ from explicit strings (SPEC §2 table).
 - Editing demo exams changes realized orders → update exact assertions in
   tests/test_build.py / test_markup.py.
 - `@word` in question text is Typst reference syntax — quote or escape it.
+- Marker collection must walk ALL content fields via `.fields()` — `attach`
+  (math scripts), `frac`, figure captions etc. don't use body/children. A
+  blank inside `$x^(#blank[..])$` broke the old body/children-only walker.
+- `#include`d content arrives as a nested `sequence` — `_flat-children`
+  unwraps it; a `#set` in the body arrives as `styled` and is rejected.
+- Math `$-1$` extracts via plaintext() as unicode minus "−1", not ASCII "-1".
 - Universe submission: copy quizforge/ to typst/packages as
   packages/preview/quizforge/<version>; never mutate a published version.
