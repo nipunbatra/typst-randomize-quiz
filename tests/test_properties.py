@@ -106,6 +106,24 @@ def test_key_mode_compiles(exam, tmp_path):
 
 
 @pytest.mark.parametrize("exam", EXAMS, ids=EXAM_IDS)
+def test_realization_independent_of_mode(exam):
+    """Exam mode and key mode must realize the identical structure — the mode
+    may change rendering only, never order, letters, or marks."""
+    s = EXAMS[exam][0]
+    def q(mode):
+        proc = subprocess.run(
+            ["typst", "query", exam, "<answerkey>", "--field", "value", "--one",
+             "--root", str(ROOT), "--input", f"set={s}", "--input", f"mode={mode}"],
+            cwd=ROOT, capture_output=True, text=True,
+        )
+        if proc.returncode != 0 and "download" in proc.stderr:
+            pytest.skip("packages unavailable offline")
+        assert proc.returncode == 0, proc.stderr
+        return proc.stdout
+    assert q("exam") == q("key")
+
+
+@pytest.mark.parametrize("exam", EXAMS, ids=EXAM_IDS)
 def test_compiles_without_warnings(exam, tmp_path):
     """Deprecations, layout non-convergence, missing fonts etc. all surface as
     typst warnings — none are acceptable in shipped papers."""

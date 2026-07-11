@@ -25,6 +25,7 @@ EXAMS = {
     "exams/demo-algorithms.typ": ["A", "B"],
     "exams/demo-linear-algebra.typ": ["A", "B"],
     "exams/demo-economics.typ": ["A", "B"],
+    "exams/demo-features.typ": ["A", "B"],
     "tests/stress-markup.typ": ["A", "B"],
     "tests/stress-bank.typ": ["A", "B"],
     "tests/stress-packages.typ": ["A", "B"],  # needs network for @preview packages

@@ -124,6 +124,7 @@
   <a href="#overview">1 Overview</a>
   <a href="#design">2 Design</a>
   <a href="#gallery">3 Gallery</a>
+  <a href="features.html">Feature tour ↗</a>
   <a href="#reference">4 Reference</a>
   <a href="#grading">5 Grading</a>
   <a href="#guarantees">6 Guarantees &amp; testing</a>
@@ -220,7 +221,7 @@
 </section>
 
 <section id="gallery">
-  <h2><span class="no">3</span>Gallery: seven subjects, one grammar</h2>
+  <h2><span class="no">3</span>Gallery: eight papers, one grammar</h2>
   <p>Each card links to the full set-A paper and key. Question bodies are ordinary Typst
   content: tables, native figures, code listings, chemical formulas, matrices — and
   third-party packages (cetz, unify, physica) work inside questions, options, and blanks.</p>
@@ -260,6 +261,11 @@
       <figcaption><b>Economics</b>supply–demand figure, elasticity table, essay
         · <a href="exam/ec101-demo.html">all versions ↗</a></figcaption>
     </figure>
+    <figure>
+      <img src="assets/qf-feature-tour-key-1.png" alt="Feature tour" loading="lazy">
+      <figcaption><b>Feature tour</b>every capability, one question each, with code
+        · <a href="features.html">snippets ↗</a> · <a href="exam/qf-feature-tour.html">versions ↗</a></figcaption>
+    </figure>
   </div>
 </section>
 
@@ -271,6 +277,8 @@
   <code>✓</code>/<code>✔</code>/<code>#yes</code> marks correct options (two ✓ → multi-select
   automatically) · “None/All/Both of the above” options pin to the last position
   automatically · large quizzes may span files via <code>#include</code>.</p>
+  <p>The <a href="features.html"><b>feature tour</b></a> shows every capability below
+  as a minimal code snippet next to its rendered output.</p>
   <h3>Inline markers</h3>
   <div class="tbl-scroll">
   <table>
@@ -332,7 +340,7 @@
     <li><b>Compile-time validation.</b> 37 classes of authoring mistakes are rejected at
       compilation with messages naming the offending question.</li>
   </ol>
-  <p>The suite currently runs <b>412 checks</b>: an invariant matrix over every set of
+  <p>The suite currently runs <b>480 checks</b>: an invariant matrix over every set of
   every exam in the repository; a 24-seed structural fuzzer that generates random exams
   (section counts, question types, option counts, pins, multi-select, fractional marks,
   sampled sections) and re-verifies all invariants; RNG position-uniformity with a pinned
