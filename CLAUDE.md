@@ -53,5 +53,9 @@ from explicit strings (SPEC §2 table).
 - `#include`d content arrives as a nested `sequence` — `_flat-children`
   unwraps it; a `#set` in the body arrives as `styled` and is rejected.
 - Math `$-1$` extracts via plaintext() as unicode minus "−1", not ASCII "-1".
+- Element `.text` fields are NOT always strings: math `op` stores content
+  there. Smartquotes need explicit handling in plaintext() or they leak repr.
+- Context-based package output (unify qty()) is statically opaque: plaintext
+  returns "" — blanks/options must tolerate it (CSV placeholder "(see key)").
 - Universe submission: copy quizforge/ to typst/packages as
   packages/preview/quizforge/<version>; never mutate a published version.

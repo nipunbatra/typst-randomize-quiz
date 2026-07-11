@@ -98,7 +98,7 @@ invariants, and writes a combined `answer_key.csv` + SHA-256 manifest.
 | Marker | Meaning |
 |--------|---------|
 | `#m(2)` | marks for the question (default 1) |
-| `✓` or `#yes` | correct option |
+| `✓`, `✔` or `#yes` | correct option |
 | `#blank[ans]`, `#blank(width: 3cm)[ans]` | a blank; answer shown only in the key |
 | `#answer(6cm)[model]`, `#answer(6cm, rubric: [...])[...]` | subjective answer space + key-only model answer |
 | `#explain[...]` | key-only explanation for an MCQ |
@@ -141,6 +141,15 @@ same engine, same guarantees, plus filtering and sampling:
 
 `pick` sampling is seeded without the set id, so every set gets the same
 questions — sampling can never break fairness.
+
+## Plays well with other packages
+
+Question bodies, options, and blank answers are ordinary Typst content, so
+third-party packages work inside them — cetz drawings, unify/metro SI units,
+physica notation, code blocks, tables. (Answers whose text cannot be extracted
+statically, such as context-based `qty(...)`, still render in the key; the
+grading CSV shows `(see key)` for them.) Global `#set`/`#show` styling goes
+*above* the `#show: quiz` line, where it styles the whole paper.
 
 ## Validation = compilation
 
