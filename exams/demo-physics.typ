@@ -11,7 +11,7 @@
     place(bottom + left, curve(
       stroke: 1pt,
       curve.move((0cm, 0cm)),
-      curve.cubic((w * 0.3, -h * 1.9), (w * 0.7, -h * 1.9), (w, 0cm)),
+      curve.cubic((w * 0.3, -h * 1.25), (w * 0.7, -h * 1.25), (w, 0cm)),
     ))
     place(bottom + left, dx: 0.9cm, dy: -0.12cm, text(size: 9pt, [$theta$]))
     place(bottom + left, line(angle: -52deg, length: 1.1cm, stroke: (thickness: 0.7pt, dash: "dashed")))

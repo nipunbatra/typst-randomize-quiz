@@ -7,19 +7,19 @@
 #let sd-fig = {
   let w = 5.6cm
   let h = 4cm
-  align(center, box(width: w + 1.4cm, height: h + 1cm, inset: (left: 0.9cm, bottom: 0.7cm, top: 0.3cm, right: 0.5cm), {
+  align(center, box(width: w + 1.9cm, height: h + 1cm, inset: (left: 1.3cm, bottom: 0.7cm, top: 0.3cm, right: 0.6cm), {
     place(bottom + left, line(length: w, stroke: 0.6pt))
     place(bottom + left, line(angle: -90deg, length: h, stroke: 0.6pt))
     place(bottom + center, dy: 0.5cm, text(size: 9pt, [quantity $Q$]))
-    place(left + horizon, dx: -0.8cm, text(size: 9pt, [price $P$]))
+    place(left + horizon, dx: -1.25cm, text(size: 9pt, [price $P$]))
     // supply: rising
     place(bottom + left, line(start: (0.4cm, -0.4cm), end: (w - 0.3cm, -h + 0.3cm), stroke: 1pt))
     place(bottom + left, dx: w - 0.35cm, dy: -h + 0.15cm, text(size: 9pt, [$S$]))
     // demand: falling, plus shifted D'
     place(bottom + left, line(start: (0.4cm, -h + 0.3cm), end: (w - 0.9cm, -0.35cm), stroke: 1pt))
-    place(bottom + left, dx: w - 0.95cm, dy: -0.3cm, text(size: 9pt, [$D$]))
+    place(bottom + left, dx: w - 0.7cm, dy: -0.15cm, text(size: 9pt, [$D$]))
     place(bottom + left, line(start: (1.2cm, -h + 0.3cm), end: (w - 0.2cm, -0.5cm), stroke: (thickness: 1pt, dash: "dashed")))
-    place(bottom + left, dx: w - 0.25cm, dy: -0.75cm, text(size: 9pt, [$D'$]))
+    place(bottom + left, dx: w - 0.05cm, dy: -0.55cm, text(size: 9pt, [$D'$]))
   }))
 }
 

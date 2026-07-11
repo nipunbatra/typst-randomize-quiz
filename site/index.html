@@ -143,8 +143,17 @@
     <code>--input set=B --input mode=exam</code> yields the corresponding student paper.
   </p>
 
-  <pre class="block"><span class="k">#show</span>: quiz.with(id: "es335-quiz-1", course: "ES 335: Machine Learning",
-                sets: ("A", "B", "C", "D"), answer-grid: true)
+  <p>A complete, minimal master — this entire file is a working quiz:</p>
+  <pre class="block"><span class="k">#import</span> "@preview/quizforge:0.1.0": *
+
+<span class="k">#show</span>: quiz.with(
+  id: "quiz-1",                  <span class="c">// seeds the shuffles — freeze once printed</span>
+  course: "ES 335: Machine Learning",
+  title: "Quiz 1",
+  duration: "20 minutes",
+  sets: ("A", "B", "C", "D"),
+  answer-grid: true,
+)
 
 <span class="k">=</span> Multiple Choice
 
@@ -152,11 +161,18 @@
   - <span class="k">✓</span> Increases bias, decreases variance
   - Decreases bias, increases variance
   - None of the above            <span class="c">// auto-pinned last</span>
+  <span class="k">#explain</span>[Larger neighbourhoods average more: smoother, stabler.]
 
 <span class="k">=</span> Fill in the Blanks
 
 + <span class="k">#m(1)</span> Computing inner products in feature space without constructing
-  the features is the kernel <span class="k">#blank[trick]</span>.</pre>
+  the features is the kernel <span class="k">#blank[trick]</span>.
+
+<span class="k">=</span> Long Answer
+
++ <span class="k">#m(3)</span> Derive the normal equation for least squares.
+  <span class="k">#answer</span>(5cm, rubric: [+2 gradient; +1 solving.])[
+    $nabla L = -2 X^T (y - X theta) = 0 arrow.r.double hat(theta) = (X^T X)^(-1) X^T y$]</pre>
 
   <p>Question types are inferred (options → MCQ; <code>#blank[…]</code> → fill-in-the-blank;
   otherwise subjective with an answer space). Marks totals, per-part subtotals, cover
@@ -212,37 +228,37 @@
     <figure>
       <img src="assets/es335-quiz-1-exam-2.png" alt="Machine learning quiz" loading="lazy">
       <figcaption><b>Machine Learning</b>kNN &amp; loss-curve figures, confusion matrix
-        · <a href="pdf/es335-quiz-1-set-A.pdf">paper</a> · <a href="pdf/es335-quiz-1-set-A-key.pdf">key</a></figcaption>
+        · <a href="exam/es335-quiz-1.html">all versions ↗</a></figcaption>
     </figure>
     <figure>
       <img src="assets/es335-2023-archive-key-2.png" alt="2023 archive quiz" loading="lazy">
       <figcaption><b>ML 2023 archive</b>real past-paper questions, ported
-        · <a href="pdf/es335-2023-archive-set-A.pdf">paper</a> · <a href="pdf/es335-2023-archive-set-A-key.pdf">key</a></figcaption>
+        · <a href="exam/es335-2023-archive.html">all versions ↗</a></figcaption>
     </figure>
     <figure>
       <img src="assets/ph101-demo-exam-1.png" alt="Physics quiz" loading="lazy">
       <figcaption><b>Physics</b>projectile figure, SI units, derivation
-        · <a href="pdf/ph101-demo-set-A.pdf">paper</a> · <a href="pdf/ph101-demo-set-A-key.pdf">key</a></figcaption>
+        · <a href="exam/ph101-demo.html">all versions ↗</a></figcaption>
     </figure>
     <figure>
       <img src="assets/ch101-demo-key-1.png" alt="Chemistry quiz" loading="lazy">
       <figcaption><b>Chemistry</b>formulas, two-blank equation balancing
-        · <a href="pdf/ch101-demo-set-A.pdf">paper</a> · <a href="pdf/ch101-demo-set-A-key.pdf">key</a></figcaption>
+        · <a href="exam/ch101-demo.html">all versions ↗</a></figcaption>
     </figure>
     <figure>
       <img src="assets/cs201-demo-exam-1.png" alt="Algorithms quiz" loading="lazy">
       <figcaption><b>Algorithms</b>code traces, true/false, master theorem
-        · <a href="pdf/cs201-demo-set-A.pdf">paper</a> · <a href="pdf/cs201-demo-set-A-key.pdf">key</a></figcaption>
+        · <a href="exam/cs201-demo.html">all versions ↗</a></figcaption>
     </figure>
     <figure>
       <img src="assets/ma102-demo-key-1.png" alt="Linear algebra quiz" loading="lazy">
       <figcaption><b>Linear Algebra</b>matrices, multi-select, proof rubric
-        · <a href="pdf/ma102-demo-set-A.pdf">paper</a> · <a href="pdf/ma102-demo-set-A-key.pdf">key</a></figcaption>
+        · <a href="exam/ma102-demo.html">all versions ↗</a></figcaption>
     </figure>
     <figure>
       <img src="assets/ec101-demo-exam-1.png" alt="Economics quiz" loading="lazy">
       <figcaption><b>Economics</b>supply–demand figure, elasticity table, essay
-        · <a href="pdf/ec101-demo-set-A.pdf">paper</a> · <a href="pdf/ec101-demo-set-A-key.pdf">key</a></figcaption>
+        · <a href="exam/ec101-demo.html">all versions ↗</a></figcaption>
     </figure>
   </div>
 </section>
@@ -262,10 +278,10 @@
     <tbody>
       <tr><td><code>#m(2)</code></td><td>Marks for the question (default 1; fractional allowed)</td></tr>
       <tr><td><code>#blank[ans]</code>, <code>#blank(width: 3cm)[ans]</code></td><td>A blank; the answer prints only in the key and exports to the CSV</td></tr>
-      <tr><td><code>#answer(6cm)[model]</code>, <code>#answer(6cm, rubric: […])[…]</code></td><td>Subjective answer space + key-only model answer and rubric</td></tr>
+      <tr><td><code>#answer(6cm)[model]</code>, <code>#answer(none, rubric: […])[…]</code></td><td>Subjective answer space (or <code>none</code> for booklet-style papers) + key-only model answer and rubric</td></tr>
       <tr><td><code>#explain[…]</code></td><td>Key-only explanation for an MCQ</td></tr>
       <tr><td><code>#pin</code> / <code>#pin-first</code></td><td>Pin an option last / first under shuffling</td></tr>
-      <tr><td><code>#opts(shuffle: false, columns: 2, multiple: true)</code></td><td>Per-question overrides</td></tr>
+      <tr><td><code>#opts(shuffle: false, columns: 2, compact: true, multiple: true)</code></td><td>Per-question overrides — <code>compact</code> flows options inline to save space</td></tr>
       <tr><td><code>#section(shuffle: false)</code></td><td>Freeze question order within a part</td></tr>
       <tr><td><code>#qid("slug")</code></td><td>Freeze a question's identity across wording edits</td></tr>
     </tbody>
@@ -273,7 +289,7 @@
   </div>
   <h3>Exam parameters</h3>
   <p><code>quiz.with(id, course, title, date, duration, sets, answer-grid,
-  instructions, header, footer)</code> — <code>header</code>/<code>footer</code> accept
+  instructions, answer-space, header, footer)</code> — <code>header</code>/<code>footer</code> accept
   <code>auto</code> (generated), <code>none</code>, fixed content, or a function of
   <code>(exam, set, mode, total)</code>. A second, constructor-based front-end
   (<code>make-exam</code> with <code>mcq()/fib()/subj()</code>, topic/difficulty filters
@@ -316,7 +332,7 @@
     <li><b>Compile-time validation.</b> 37 classes of authoring mistakes are rejected at
       compilation with messages naming the offending question.</li>
   </ol>
-  <p>The suite currently runs <b>399 checks</b>: an invariant matrix over every set of
+  <p>The suite currently runs <b>412 checks</b>: an invariant matrix over every set of
   every exam in the repository; a 24-seed structural fuzzer that generates random exams
   (section counts, question types, option counts, pins, multi-select, fractional marks,
   sampled sections) and re-verifies all invariants; RNG position-uniformity with a pinned

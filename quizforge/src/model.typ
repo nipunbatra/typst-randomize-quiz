@@ -45,6 +45,7 @@
   multiple: false,
   shuffle: true,
   columns: 1,
+  compact: false,
   explanation: none,
 ) = {
   _check-id(id)
@@ -67,7 +68,7 @@
   (
     type: "mcq", id: id, body: body, options: opts, marks: marks,
     topic: topic, difficulty: difficulty, multiple: multiple,
-    shuffle: shuffle, columns: columns, explanation: explanation,
+    shuffle: shuffle, columns: columns, compact: compact, explanation: explanation,
   )
 }
 
@@ -113,7 +114,10 @@
 ) = {
   _check-id(id)
   _check-marks(id, marks)
-  assert(type(answer-space) == length, message: id + ": answer-space must be a length, e.g. 8cm")
+  assert(
+    answer-space == none or type(answer-space) == length,
+    message: id + ": answer-space must be a length (e.g. 8cm) or none for no space",
+  )
   (
     type: "subjective", id: id, body: body, marks: marks,
     topic: topic, difficulty: difficulty,
@@ -201,11 +205,12 @@
 }
 
 // Per-question overrides: #opts(shuffle: false, columns: 2, multiple: true)
-#let opts(shuffle: auto, columns: auto, multiple: auto) = {
+#let opts(shuffle: auto, columns: auto, multiple: auto, compact: auto) = {
   let v = (:)
   if shuffle != auto { v.insert("shuffle", shuffle) }
   if columns != auto { v.insert("columns", columns) }
   if multiple != auto { v.insert("multiple", multiple) }
+  if compact != auto { v.insert("compact", compact) }
   metadata((qf: "opts", v: v))
 }
 
@@ -215,7 +220,10 @@
 // Subjective answer block: #answer(6cm)[model answer] or
 // #answer(6cm, rubric: [...])[...] or just #answer(6cm) for space only.
 #let answer(space, rubric: none, ..body) = {
-  assert(type(space) == length, message: "answer(): first argument is the answer space, e.g. answer(6cm)[...]")
+  assert(
+    space == none or type(space) == length,
+    message: "answer(): first argument is the answer space (e.g. 6cm), or none for no space on the paper",
+  )
   assert(body.pos().len() <= 1, message: "answer() takes at most one model-answer body")
   metadata((qf: "answer", space: space, model: body.pos().at(0, default: none), rubric: rubric))
 }

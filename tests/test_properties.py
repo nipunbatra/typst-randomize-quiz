@@ -106,6 +106,22 @@ def test_key_mode_compiles(exam, tmp_path):
 
 
 @pytest.mark.parametrize("exam", EXAMS, ids=EXAM_IDS)
+def test_compiles_without_warnings(exam, tmp_path):
+    """Deprecations, layout non-convergence, missing fonts etc. all surface as
+    typst warnings — none are acceptable in shipped papers."""
+    proc = subprocess.run(
+        ["typst", "compile", exam, str(tmp_path / "w.pdf"), "--root", str(ROOT),
+         "--input", "mode=exam"],
+        cwd=ROOT, capture_output=True, text=True,
+    )
+    if proc.returncode != 0 and "download" in proc.stderr:
+        pytest.skip("packages unavailable offline")
+    assert proc.returncode == 0, proc.stderr
+    warnings = [l for l in proc.stderr.splitlines() if "warning:" in l]
+    assert warnings == [], proc.stderr
+
+
+@pytest.mark.parametrize("exam", EXAMS, ids=EXAM_IDS)
 def test_question_order_varies_when_shuffling_possible(exam):
     """Across an exam's sets, at least one ordering difference must exist
     (unless every section is shuffle: false, which no repo exam is)."""

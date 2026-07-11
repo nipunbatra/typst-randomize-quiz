@@ -78,6 +78,36 @@ These instructions contain a list on purpose:
   - II and III
   - I, II and III
 
++ #m(1) 机器学习中，「过拟合」指的是什么？(CJK stress)
+  - ✓ 模型在训练集上表现好，在新数据上表现差
+  - 模型参数太少
+  - 训练数据太多
+
++ #m(1) Which URL is well-formed? (unbreakable-token stress)
+  - ✓ `https://example.com/a/very/deep/path/that/goes/on/and/on/without/any/spaces`
+  - `ht tp://broken url`
+  - Neither of these
+
++ #m(1) #opts(compact: true) Compact inline options to save space: $2 + 2 = $?
+  - $3$
+  - ✓ $4$
+  - $5$
+  - $6$
+  - $22$
+
++ #m(2) Which of these is the package thumbnail, shown above? (image in body and option)
+  #align(center, image("/quizforge/thumbnail.png", width: 2.2cm))
+  - ✓ The image above
+  - #image("/quizforge/thumbnail.png", width: 1cm)
+  - There is no image
+
++ #m(1) Select the vowels: (three-letter answer stresses the key grid)
+  - ✓ a
+  - b
+  - ✓ e
+  - c
+  - ✓ i
+
 = Blanks in Odd Places
 
 + #m(2) Styled blank: the *#blank[bold answer]* sits inside strong text, and a
@@ -93,3 +123,7 @@ These instructions contain a list on purpose:
 
 + #m(3) Second long question, always second.
   #answer(3cm, rubric: [All-or-nothing.])[Another model answer.]
+
++ #m(2) Third long question: no answer space on the paper — students use a
+  booklet (answer(none) stress).
+  #answer(none)[Model answer for the booklet question.]

@@ -42,11 +42,12 @@ def gen_exam(seed: int) -> tuple[str, dict]:
             opts.append(f"opt({', '.join(flags)}, {inner})" if flags else inner)
         marks = rng.choice([0.5, 1, 1, 2, 2.5, 3])
         shuffle = "true" if rng.random() < 0.85 else "false"
+        compact = "true" if rng.random() < 0.2 else "false"
         return (
             qid, "mcq",
             f'mcq("{qid}", [Fuzz question {qid}: pick wisely.],\n'
             f'  options: ({", ".join(opts)},),\n'
-            f'  marks: {marks}, multiple: {str(multiple).lower()}, shuffle: {shuffle},\n'
+            f'  marks: {marks}, multiple: {str(multiple).lower()}, shuffle: {shuffle}, compact: {compact},\n'
             f'  topic: "t{rng.randint(0, 2)}", difficulty: "{rng.choice(DIFF)}")'
         )
 
@@ -66,10 +67,11 @@ def gen_exam(seed: int) -> tuple[str, dict]:
         nonlocal qcount
         qcount += 1
         qid = f"fz{seed}-q{qcount}"
+        space = "none" if rng.random() < 0.3 else f"{rng.randint(2, 6)}cm"
         return (
             qid, "subjective",
             f'subj("{qid}", [Discuss {qid} at length.], marks: {rng.choice([2, 3, 4])}, '
-            f'answer-space: {rng.randint(2, 6)}cm, model-answer: [Model for {qid}.])'
+            f'answer-space: {space}, model-answer: [Model for {qid}.])'
         )
 
     makers = [new_mcq, new_mcq, new_fib, new_subj]

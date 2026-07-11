@@ -9,6 +9,7 @@
   title: "Quiz 3 — Stoichiometry & Periodicity",
   duration: "30 minutes",
   sets: ("A", "B"),
+  instructions: ([Answer Part C in your answer booklet, not on this paper.],),
 )
 
 = Multiple Choice
@@ -48,7 +49,7 @@
 + #m(3) The Haber process $N_2 + 3 H_2 arrows.rl 2 N H_3$ is exothermic.
   Using Le Chatelier's principle, predict how (i) raising the temperature and
   (ii) raising the pressure each shift the equilibrium, with one-line reasons.
-  #answer(5cm, rubric: [+1.5 temperature: shifts left (heat is a product);
+  #answer(none, rubric: [+1.5 temperature: shifts left (heat is a product);
     +1.5 pressure: shifts right (4 gas moles → 2).])[
     (i) Heating shifts the equilibrium left — the reverse (endothermic)
     direction absorbs the added heat. (ii) Compression shifts it right, toward

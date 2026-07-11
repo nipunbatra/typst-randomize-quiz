@@ -50,10 +50,15 @@ def test_torture_compiles_both_modes(tmp_path):
 def test_torture_structure(torture):
     meta = torture["A"]
     qs = questions_of(meta)
-    assert len(qs) == 14
-    assert meta["total"] == 23.5  # fractional marks survive
+    assert len(qs) == 20
+    assert meta["total"] == 31.5  # fractional marks survive
     types = [q["type"] for q in qs]
-    assert types.count("mcq") == 10 and types.count("fill_blank") == 2 and types.count("subjective") == 2
+    assert types.count("mcq") == 15 and types.count("fill_blank") == 2 and types.count("subjective") == 3
+
+
+def test_three_letter_multiselect_answer(torture):
+    for meta in torture.values():
+        assert any(len(q["answer"]) == 3 for q in questions_of(meta) if q["type"] == "mcq")
 
 
 def test_torture_key_consistent_all_sets(torture):

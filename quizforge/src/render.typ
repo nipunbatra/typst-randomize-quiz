@@ -21,18 +21,32 @@
 )
 
 #let _render-options(entry, key) = {
+  let deco-of = o => {
+    let mark = key and o.correct
+    t => if mark { text(fill: key-color, weight: "bold", t) } else { t }
+  }
+  if entry.q.at("compact", default: false) {
+    // space-saving layout: options flow inline, breaking between (not inside)
+    return entry.options.enumerate().map(p => {
+      let deco = deco-of(p.at(1))
+      box({
+        deco("(" + LETTERS.at(p.at(0)) + ") ")
+        deco(p.at(1).body)
+        if key and p.at(1).correct { text(fill: key-color, weight: "bold", " ✓") }
+      })
+    }).join(h(1.6em, weak: true))
+  }
   let cells = entry.options.enumerate().map(p => {
     let j = p.at(0)
     let o = p.at(1)
-    let mark = key and o.correct
-    let deco = t => if mark { text(fill: key-color, weight: "bold", t) } else { t }
+    let deco = deco-of(o)
     grid(
       columns: (1.8em, 1fr),
       column-gutter: 0.3em,
       deco("(" + LETTERS.at(j) + ")"),
       {
         deco(o.body)
-        if mark { text(fill: key-color, weight: "bold", " ✓") }
+        if key and o.correct { text(fill: key-color, weight: "bold", " ✓") }
       },
     )
   })
@@ -92,7 +106,7 @@
         if q.rubric != none {
           block(inset: (left: 2.4em), above: 0.8em, key-note("Rubric", q.rubric, luma(246), luma(120)))
         }
-      } else {
+      } else if q.answer-space != none {
         v(q.answer-space)
       }
     }
@@ -115,7 +129,8 @@
         ..chunk.map(e => text(size: 9pt, str(e.qno))),
         text(size: 9pt, weight: "bold", "Ans"),
         ..chunk.map(e => if key {
-          text(fill: key-color, weight: "bold", e.answer)
+          // multi-select answers can be 3+ letters; shrink to fit the cell
+          text(fill: key-color, weight: "bold", size: if e.answer.len() > 2 { 7pt } else { 9pt }, e.answer)
         } else {
           v(1.3em)
         }),

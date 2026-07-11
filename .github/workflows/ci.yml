@@ -40,39 +40,8 @@ jobs:
         run: |
           curl -fsSL "https://github.com/typst/typst/releases/download/v${TYPST_VERSION}/typst-x86_64-unknown-linux-musl.tar.xz" | tar -xJ
           echo "$PWD/typst-x86_64-unknown-linux-musl" >> "$GITHUB_PATH"
-      - name: Build gallery exams and previews
-        run: |
-          set -euo pipefail
-          mkdir -p _site/assets _site/pdf
-          cp site/index.html _site/
-
-          build_one () { # <exam file> <exam id> <sets...>
-            local f="$1" id="$2"; shift 2
-            python3 scripts/build.py "$f" --sets "$@"
-            cp "build/$id/set-A.pdf" "_site/pdf/$id-set-A.pdf"
-            cp "build/$id/set-A-key.pdf" "_site/pdf/$id-set-A-key.pdf"
-          }
-          build_one exams/quiz3.typ            es335-quiz-1       A B C D
-          build_one exams/quiz4-ml23.typ       es335-2023-archive A B
-          build_one exams/demo-physics.typ     ph101-demo         A B
-          build_one exams/demo-chemistry.typ   ch101-demo         A B
-          build_one exams/demo-algorithms.typ  cs201-demo         A B
-          build_one exams/demo-linear-algebra.typ ma102-demo      A B
-          build_one exams/demo-economics.typ   ec101-demo         A B
-          cp build/es335-quiz-1/answer_key.csv _site/pdf/answer_key.csv
-
-          png () { # <exam file> <prefix> <mode> <pages>
-            typst compile "$1" "_site/assets/$2-{p}.png" \
-              --root . --format png --pages "$4" --ppi 110 --input set=A --input "mode=$3"
-          }
-          png exams/quiz3.typ            es335-quiz-1-exam       exam 1-2
-          png exams/quiz3.typ            es335-quiz-1-key        key  2
-          png exams/quiz4-ml23.typ       es335-2023-archive-key  key  2
-          png exams/demo-physics.typ     ph101-demo-exam         exam 1
-          png exams/demo-chemistry.typ   ch101-demo-key          key  1
-          png exams/demo-algorithms.typ  cs201-demo-exam         exam 1
-          png exams/demo-linear-algebra.typ ma102-demo-key       key  1
-          png exams/demo-economics.typ   ec101-demo-exam         exam 1
+      - name: Assemble site (builds all gallery exams + previews + exam pages)
+        run: python3 scripts/make_site.py --out _site
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site

@@ -155,7 +155,7 @@
   opt(correct: correct, fixed: fixed, body)
 }
 
-#let _build-question(item, where) = {
+#let _build-question(item, where, default-space) = {
   let markers = ()
   let option-items = ()
   let body-parts = ()
@@ -232,6 +232,7 @@
       multiple: over.at("multiple", default: ncorrect > 1),
       shuffle: over.at("shuffle", default: true),
       columns: over.at("columns", default: 1),
+      compact: over.at("compact", default: false),
       explanation: explanation,
     )
   } else if blanks.len() > 0 {
@@ -243,7 +244,7 @@
     fib(id, body, answers: blanks, marks: marks)
   } else {
     assert(explanation == none, message: where + ": #explain[...] is only supported on MCQs")
-    let space = if ans-mk != none { ans-mk.space } else { 5cm }
+    let space = if ans-mk != none { ans-mk.space } else { default-space }
     subj(
       id,
       body,
@@ -257,7 +258,7 @@
 
 // Split the document body into sections of questions.
 // Returns (questions: (..), sections: (..)) ready for make-exam.
-#let _parse(body) = {
+#let _parse(body, default-space) = {
   let sections = ()
   let cur = (title: none, shuffle: true, pre: (), items: ())
 
@@ -329,7 +330,7 @@
         if sec.title == none { "question " + str(qi + 1) }
         else { "question " + str(qi + 1) + " of part '" + plaintext(sec.title).trim() + "'" }
       )
-      let q = _build-question(item, where)
+      let q = _build-question(item, where, default-space)
       assert(
         q.id not in seen,
         message: "quizforge: " + where + " and " + seen.at(q.id, default: "?")
@@ -364,6 +365,7 @@
   sets: ("A",),
   answer-grid: false,
   instructions: (),
+  answer-space: 5cm, // default space for subjective questions without #answer(...); none = no space
   header: auto, // auto = generated | none = off | content | (info) => content
   footer: auto, // ditto; info = (exam, set, mode, total)
   body,
@@ -372,7 +374,7 @@
     id != none,
     message: "quizforge: give the quiz an id — #show: quiz.with(id: \"my-quiz-1\", ...)",
   )
-  let parsed = _parse(body)
+  let parsed = _parse(body, answer-space)
   let exam = (
     id: id,
     course: course,

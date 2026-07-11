@@ -27,7 +27,7 @@ quizforge/            the package (Universe-ready: manifest, license, template, 
 exams/                demos: quiz3.typ (ML, figures+tables) · quiz4-ml23.typ (ported real 2023 papers) · quiz2.typ · quiz1.typ (banks)
 questions/            demo banks for the constructor front-end
 scripts/build.py      all sets ∥ → invariant checks → answer_key.csv + manifest.json
-tests/                399 checks: invariant matrix over every exam×set, 24-seed fuzzer, goldens, error contract
+tests/                412 checks: invariant matrix over every exam×set, 24-seed fuzzer, goldens, error contract
 ```
 
 ```bash

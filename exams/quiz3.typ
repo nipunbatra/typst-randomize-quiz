@@ -24,11 +24,11 @@
     place(left + horizon, dx: -0.75cm, text(size: 9pt, [$x_2$]))
     box(width: w, height: h, {
       // class A cluster (top-left) with two members near the query
-      dot(0.18, 0.72); dot(0.30, 0.84); dot(0.52, 0.86); dot(0.34, 0.60); dot(0.38, 0.44)
+      dot(0.18, 0.72); dot(0.30, 0.84); dot(0.52, 0.86); dot(0.32, 0.62); dot(0.36, 0.44)
       // class B cluster (bottom-right) with one stray member nearest the query
       sq(0.62, 0.30); sq(0.70, 0.42); sq(0.80, 0.24); sq(0.66, 0.14); sq(0.86, 0.44)
-      sq(0.46, 0.60)
-      query(0.42, 0.55)
+      sq(0.50, 0.63)
+      query(0.44, 0.55)
     })
   }))
 }
@@ -37,7 +37,7 @@
 #let loss-fig = {
   let w = 6.4cm
   let h = 3.6cm
-  align(center, box(width: w + 1.6cm, height: h + 1.2cm, inset: (left: 1cm, bottom: 0.8cm, top: 0.4cm, right: 0.6cm), {
+  align(center, box(width: w + 3.4cm, height: h + 1.2cm, inset: (left: 1cm, bottom: 0.8cm, top: 0.4cm, right: 2.4cm), {
     place(bottom + left, line(length: w, stroke: 0.6pt))
     place(bottom + left, line(angle: -90deg, length: h, stroke: 0.6pt))
     place(bottom + center, dy: 0.55cm, text(size: 9pt, [epochs]))
@@ -54,7 +54,7 @@
       curve.move((0cm, -h + 0.2cm)),
       curve.cubic((w * 0.3, -0.9cm), (w * 0.5, -1.1cm), (w, -h + 0.6cm)),
     ))
-    place(top + right, dx: -0.2cm, dy: 0.1cm, text(size: 8.5pt, [--- validation \ — training]))
+    place(top + right, dx: 2.2cm, dy: 0.15cm, text(size: 8.5pt, [--- validation \ — training]))
   }))
 }
 

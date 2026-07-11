@@ -100,10 +100,10 @@ invariants, and writes a combined `answer_key.csv` + SHA-256 manifest.
 | `#m(2)` | marks for the question (default 1) |
 | `✓`, `✔` or `#yes` | correct option |
 | `#blank[ans]`, `#blank(width: 3cm)[ans]` | a blank; answer shown only in the key |
-| `#answer(6cm)[model]`, `#answer(6cm, rubric: [...])[...]` | subjective answer space + key-only model answer |
+| `#answer(6cm)[model]`, `#answer(none, rubric: [...])[...]` | subjective answer space + key-only model answer; `none` prints no space (answer-booklet style) |
 | `#explain[...]` | key-only explanation for an MCQ |
 | `#pin` / `#pin-first` | pin an option last / first |
-| `#opts(shuffle: false, columns: 2, multiple: true)` | per-question overrides |
+| `#opts(shuffle: false, columns: 2, compact: true, multiple: true)` | per-question overrides; `compact` flows options inline to save space |
 | `#section(shuffle: false)` | freeze question order in a part |
 | `#qid("slug")` | freeze a question's identity (see below) |
 
