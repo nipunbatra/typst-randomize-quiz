@@ -73,43 +73,75 @@ FEATURES = [
 ]
 
 PAGE_CSS = """
-  :root { --bg:#fdfdfb; --fg:#1a1a1a; --muted:#55555c; --rule:#c9c9c2;
-          --accent:#0a5c2c; --card:#ffffff; }
+  :root { --bg:#fbfbf9; --surface:#fff; --ink:#17232b; --muted:#5c6a72; --faint:#8a969c;
+          --accent:#0a6b34; --accent2:#8f1d1d; --border:#eae7df; --code:#f5f4ef;
+          --shadow:0 1px 2px rgba(20,32,28,.05),0 6px 22px rgba(20,32,28,.05); }
   @media (prefers-color-scheme: dark) {
-    :root { --bg:#161615; --fg:#e8e8e4; --muted:#a2a29c; --rule:#3c3c39;
-            --accent:#6fbe8b; --card:#1d1d1c; } }
-  * { box-sizing:border-box; margin:0; }
-  body { background:var(--bg); color:var(--fg);
-         font:17px/1.6 "Source Serif 4", Georgia, serif; padding:0 24px; }
-  .page { max-width:900px; margin:0 auto; }
-  a { color:var(--accent); }
-  header { padding:48px 0 10px; border-bottom:2px solid var(--fg); }
-  header .crumb { font-family:"Source Sans 3",sans-serif; font-size:.85rem; }
-  header .crumb a { text-decoration:none; }
-  h1 { font-size:1.9rem; margin-top:6px; }
-  .facts { font-family:"Source Sans 3",sans-serif; font-size:.88rem;
-           color:var(--muted); margin:10px 0 14px; display:flex; gap:18px; flex-wrap:wrap; }
-  p.blurb { margin:22px 0 6px; }
-  h2 { font-size:1.15rem; margin:34px 0 12px; padding-bottom:5px;
-       border-bottom:1px solid var(--rule); }
+    :root { --bg:#0e1311; --surface:#151c19; --ink:#e7ede9; --muted:#94a49b; --faint:#6b7f76;
+            --accent:#5cc084; --accent2:#e28f8f; --border:#233029; --code:#111815;
+            --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 26px rgba(0,0,0,.30); } }
+  :root[data-theme="light"] { --bg:#fbfbf9; --surface:#fff; --ink:#17232b; --muted:#5c6a72; --faint:#8a969c; --accent:#0a6b34; --accent2:#8f1d1d; --border:#eae7df; --code:#f5f4ef; --shadow:0 1px 2px rgba(20,32,28,.05),0 6px 22px rgba(20,32,28,.05); }
+  :root[data-theme="dark"] { --bg:#0e1311; --surface:#151c19; --ink:#e7ede9; --muted:#94a49b; --faint:#6b7f76; --accent:#5cc084; --accent2:#e28f8f; --border:#233029; --code:#111815; --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 26px rgba(0,0,0,.30); }
+  * { box-sizing:border-box; margin:0; } html { scroll-behavior:smooth; }
+  body { background:var(--bg); color:var(--ink); -webkit-font-smoothing:antialiased;
+         font:16px/1.62 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif; }
+  code,pre { font-family:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace; }
+  a { color:var(--accent); text-decoration:none; } a:hover { color:var(--accent2); }
+  .page { max-width:960px; margin:0 auto; padding:0 24px 10px; }
+  nav { position:sticky; top:0; z-index:20; background:color-mix(in srgb,var(--bg) 82%,transparent);
+        backdrop-filter:saturate(160%) blur(10px); border-bottom:1px solid var(--border); }
+  nav .row { max-width:960px; margin:0 auto; padding:11px 24px; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  .brand { font-weight:800; font-size:1.1rem; letter-spacing:-.02em; color:var(--ink); }
+  .brand .dot { color:var(--accent2); }
+  .navpk { display:flex; gap:4px; flex-wrap:wrap; flex:1; }
+  .navpk a { font-size:.8rem; color:var(--muted); padding:3px 8px; border-radius:6px; }
+  .navpk a:hover { background:var(--code); color:var(--ink); }
+  .ghlink { font-size:.85rem; color:var(--muted); font-weight:600; white-space:nowrap; }
+  .themetoggle { cursor:pointer; background:none; border:1px solid var(--border); color:var(--muted);
+    border-radius:7px; width:30px; height:30px; font-size:.9rem; display:grid; place-items:center; }
+  .themetoggle:hover { color:var(--ink); border-color:var(--accent); }
+  header.page-head { padding:44px 0 22px; margin-bottom:6px; border-bottom:1px solid var(--border); }
+  header .crumb { font-size:.82rem; color:var(--muted); }
+  h1 { font-size:2.2rem; letter-spacing:-.02em; margin-top:10px; font-weight:800; }
+  .facts { font-size:.86rem; color:var(--muted); margin-top:12px; display:flex; gap:16px; flex-wrap:wrap; }
+  p.blurb { margin:22px 0 6px; max-width:74ch; }
+  h2 { font-size:1.3rem; font-weight:800; letter-spacing:-.01em; margin:34px 0 14px; }
   .sets { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
   @media (max-width:820px){ .sets { grid-template-columns:repeat(2,1fr);} }
-  figure { border:1px solid var(--rule); background:var(--card); padding:7px; margin:0; }
-  figure img { width:100%; display:block; border:1px solid var(--rule); }
-  figcaption { font-family:"Source Sans 3",sans-serif; font-size:.82rem; padding-top:7px; }
-  figcaption b { font-size:.95rem; }
-  figcaption a { text-decoration:none; }
+  figure { border:1px solid var(--border); background:var(--surface); padding:8px; margin:0;
+           border-radius:12px; box-shadow:var(--shadow); transition:transform .14s,border-color .14s; }
+  figure:hover { transform:translateY(-3px); border-color:var(--accent); }
+  figure img { width:100%; display:block; border:1px solid var(--border); border-radius:7px; }
+  figcaption { font-size:.82rem; color:var(--muted); padding:9px 4px 3px; }
+  figcaption b { font-size:.92rem; color:var(--ink); }
   .keyrow { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
   @media (max-width:700px){ .keyrow { grid-template-columns:1fr; } }
-  footer { margin:56px 0 36px; padding-top:10px; border-top:2px solid var(--fg);
-           font-family:"Source Sans 3",sans-serif; font-size:.84rem; color:var(--muted); }
+  footer { margin:56px 0 40px; padding-top:14px; border-top:1px solid var(--border);
+           font-size:.84rem; color:var(--muted); }
 """
 
-FONTS = (
-    '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
-    '<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,700'
-    '&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">'
-)
+THEME_INIT = '<script>(function(){var t=localStorage.getItem("qf-theme");if(t)document.documentElement.setAttribute("data-theme",t);})();</script>'
+
+
+def nav_html(base=""):
+    """Sticky nav shared by every sub-page. `base` is the path prefix to the site root."""
+    return (
+        '<nav><div class="row">'
+        f'<a href="{base}index.html" class="brand">quizforge<span class="dot">.</span></a>'
+        '<div class="navpk">'
+        f'<a href="{base}index.html#overview">overview</a>'
+        f'<a href="{base}index.html#design">design</a>'
+        f'<a href="{base}index.html#gallery">gallery</a>'
+        f'<a href="{base}features.html">features&nbsp;↗</a>'
+        f'<a href="{base}index.html#reference">reference</a>'
+        '</div>'
+        '<a class="ghlink" href="https://github.com/nipunbatra/quizforge">GitHub&nbsp;↗</a>'
+        '<button class="themetoggle" onclick="var d=document.documentElement,'
+        "n=(d.getAttribute('data-theme')==='dark')?'light':'dark';"
+        "d.setAttribute('data-theme',n);localStorage.setItem('qf-theme',n);"
+        '" aria-label="Toggle theme">◑</button>'
+        '</div></nav>'
+    )
 
 
 def run(cmd, what, ok_fail=False):
@@ -161,23 +193,31 @@ def features_page_html(shots_exam, shots_key):
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Feature tour — quizforge</title>
-{FONTS}
+{THEME_INIT}
 <style>{PAGE_CSS}
-  pre.block {{ background: rgba(127,127,127,.08); border-left: 3px solid var(--accent);
-              padding: 12px 14px; overflow-x: auto; font: 0.8rem/1.5 "Source Code Pro", monospace; margin: 10px 0 4px; white-space: pre; }}
+  pre.block {{ background:var(--code); border:1px solid var(--border); border-left:3px solid var(--accent);
+              border-radius:11px; padding:13px 15px; overflow-x:auto; font:0.8rem/1.55 ui-monospace,monospace;
+              margin:10px 0 4px; white-space:pre; }}
+  section#tour-body > section {{ padding-top:8px; }}
+  section#tour-body > section h2 {{ font-size:1.08rem; margin:28px 0 6px; }}
+  section#tour-body > section p {{ color:var(--muted); max-width:74ch; margin:6px 0; }}
   .duo {{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin: 14px 0; }}
   @media (max-width:700px) {{ .duo {{ grid-template-columns:1fr; }} }}
 </style>
 </head>
-<body><div class="page">
-<header>
+<body>
+{nav_html("")}
+<div class="page">
+<header class="page-head">
   <div class="crumb"><a href="index.html">quizforge</a> / feature tour</div>
   <h1>Every capability, with the code that produces it</h1>
   <div class="facts"><span>Each snippet is a complete question — drop it into any quiz.</span>
     <span><a href="exam/qf-feature-tour.html">rendered versions ↗</a> ·
     <a href="https://github.com/nipunbatra/quizforge/blob/main/exams/demo-features.typ">full source ↗</a></span></div>
 </header>
+<section id="tour-body">
 {chr(10).join(entries)}
+</section>
 <h2 id="rendered">The tour, rendered</h2>
 <p>All of the snippets above live in one real randomized exam
 (<a href="https://github.com/nipunbatra/quizforge/blob/main/exams/demo-features.typ">exams/demo-features.typ</a>).
@@ -212,11 +252,13 @@ def exam_page_html(meta, blurb, n_questions, source):
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{title} — quizforge</title>
-{FONTS}
+{THEME_INIT}
 <style>{PAGE_CSS}</style>
 </head>
-<body><div class="page">
-<header>
+<body>
+{nav_html("../")}
+<div class="page">
+<header class="page-head">
   <div class="crumb"><a href="../index.html">quizforge</a> / gallery / {eid}</div>
   <h1>{title}</h1>
   <div class="facts">

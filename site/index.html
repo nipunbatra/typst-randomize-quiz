@@ -5,147 +5,177 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>quizforge — deterministic randomized exam sets in Typst</title>
 <meta name="description" content="quizforge builds N randomized sets of an exam from one plain Typst document, with auto-generated answer keys and machine-readable grading data.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=Source+Sans+3:wght@400;600&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
+<script>(function(){var t=localStorage.getItem("qf-theme");if(t)document.documentElement.setAttribute("data-theme",t);})();</script>
 <style>
-  :root {
-    --bg: #fdfdfb; --fg: #1a1a1a; --muted: #55555c; --rule: #c9c9c2;
-    --accent: #0a5c2c; --key: #8f1d1d; --code-bg: #f4f4ef; --card: #ffffff;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #161615; --fg: #e8e8e4; --muted: #a2a29c; --rule: #3c3c39;
-      --accent: #6fbe8b; --key: #e08a8a; --code-bg: #202020; --card: #1d1d1c;
-    }
-  }
-  * { box-sizing: border-box; margin: 0; }
-  html { scroll-behavior: smooth; }
-  body {
-    background: var(--bg); color: var(--fg);
-    font: 17.5px/1.62 "Source Serif 4", Georgia, serif;
-    padding: 0 24px;
-  }
-  .page { max-width: 860px; margin: 0 auto; }
-  a { color: var(--accent); }
-  code, pre { font-family: "Source Code Pro", ui-monospace, monospace; font-size: 0.82em; }
+ :root{
+   --bg:#fbfbf9; --surface:#ffffff; --ink:#17232b; --muted:#5c6a72; --faint:#8a969c;
+   --accent:#0a6b34; --accent2:#8f1d1d; --border:#eae7df; --code:#f5f4ef;
+   --keytint:#fbf1f1; --shadow:0 1px 2px rgba(20,32,28,.05),0 6px 22px rgba(20,32,28,.05);
+ }
+ @media (prefers-color-scheme: dark){ :root{
+   --bg:#0e1311; --surface:#151c19; --ink:#e7ede9; --muted:#94a49b; --faint:#6b7f76;
+   --accent:#5cc084; --accent2:#e28f8f; --border:#233029; --code:#111815;
+   --keytint:#1e1616; --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 26px rgba(0,0,0,.30);
+ }}
+ :root[data-theme="light"]{ --bg:#fbfbf9; --surface:#fff; --ink:#17232b; --muted:#5c6a72; --faint:#8a969c; --accent:#0a6b34; --accent2:#8f1d1d; --border:#eae7df; --code:#f5f4ef; --keytint:#fbf1f1; --shadow:0 1px 2px rgba(20,32,28,.05),0 6px 22px rgba(20,32,28,.05); }
+ :root[data-theme="dark"]{ --bg:#0e1311; --surface:#151c19; --ink:#e7ede9; --muted:#94a49b; --faint:#6b7f76; --accent:#5cc084; --accent2:#e28f8f; --border:#233029; --code:#111815; --keytint:#1e1616; --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 26px rgba(0,0,0,.30); }
+ *{ box-sizing:border-box; } html{ scroll-behavior:smooth; }
+ body{ margin:0; background:var(--bg); color:var(--ink); -webkit-font-smoothing:antialiased;
+   font:16px/1.65 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif; }
+ code,pre,.mono{ font-family:ui-monospace,"SF Mono","JetBrains Mono","Cascadia Code",Menlo,Consolas,monospace; }
+ a{ color:var(--accent); text-decoration:none; } a:hover{ color:var(--accent2); }
+ .wrap{ max-width:1000px; margin:0 auto; padding:0 24px; }
+ section p, section li { max-width:74ch; }
 
-  header.masthead { padding: 64px 0 8px; border-bottom: 2px solid var(--fg); }
-  .masthead h1 { font-size: 2.6rem; font-weight: 700; letter-spacing: -0.01em; }
-  .masthead .sub { font-size: 1.12rem; color: var(--muted); margin-top: 6px; max-width: 640px; font-style: italic; }
-  .meta-line {
-    font-family: "Source Sans 3", sans-serif; font-size: 0.86rem; color: var(--muted);
-    margin: 14px 0 12px; display: flex; gap: 18px; flex-wrap: wrap;
-  }
-  .meta-line a { text-decoration: none; font-weight: 600; }
-  nav.toc {
-    font-family: "Source Sans 3", sans-serif; font-size: 0.86rem;
-    border-bottom: 1px solid var(--rule); padding: 10px 0; margin-bottom: 8px;
-    display: flex; gap: 20px; flex-wrap: wrap;
-  }
-  nav.toc a { text-decoration: none; color: var(--fg); }
-  nav.toc a:hover { color: var(--accent); }
+ /* nav */
+ nav{ position:sticky; top:0; z-index:20; background:color-mix(in srgb,var(--bg) 82%,transparent);
+   backdrop-filter:saturate(160%) blur(10px); border-bottom:1px solid var(--border); }
+ nav .row{ max-width:1000px; margin:0 auto; padding:11px 24px; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+ .brand{ font-weight:800; font-size:1.12rem; letter-spacing:-.02em; color:var(--ink); }
+ .brand .dot{ color:var(--accent2); }
+ .navpk{ display:flex; gap:4px; flex-wrap:wrap; flex:1; }
+ .navpk a{ font-size:.8rem; color:var(--muted); padding:3px 8px; border-radius:6px; }
+ .navpk a:hover{ background:var(--code); color:var(--ink); }
+ .ghlink{ font-size:.85rem; color:var(--muted); font-weight:600; white-space:nowrap; }
+ .ghlink:hover{ color:var(--accent); }
+ .themetoggle{ cursor:pointer; background:none; border:1px solid var(--border); color:var(--muted);
+   border-radius:7px; width:30px; height:30px; font-size:.9rem; display:grid; place-items:center; }
+ .themetoggle:hover{ color:var(--ink); border-color:var(--accent); }
 
-  section { margin-top: 52px; }
-  h2 {
-    font-size: 1.4rem; font-weight: 700; margin-bottom: 14px;
-    padding-bottom: 6px; border-bottom: 1px solid var(--rule);
-  }
-  h2 .no { color: var(--muted); font-weight: 400; margin-right: 10px; }
-  h3 { font-family: "Source Sans 3", sans-serif; font-size: 0.95rem; margin: 22px 0 8px; }
-  p + p { margin-top: 12px; }
-  .abstract { font-size: 1.02em; }
-  .abstract b { font-weight: 600; }
+ /* hero */
+ .hero{ padding:70px 0 30px; text-align:center; }
+ .hero h1{ font-size:clamp(2.6rem,6vw,4rem); line-height:1.02; letter-spacing:-.035em; margin:0 0 16px; font-weight:850; }
+ .hero h1 .dot{ color:var(--accent2); }
+ .hero .lede{ font-size:clamp(1.05rem,2.3vw,1.28rem); color:var(--muted); max-width:660px; margin:0 auto 24px; text-wrap:balance; }
+ .hero .lede em{ color:var(--ink); font-style:normal; font-weight:600; }
+ .stats{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:24px; }
+ .stat{ background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:9px 15px; box-shadow:var(--shadow); }
+ .stat b{ font-size:1.1rem; font-variant-numeric:tabular-nums; } .stat span{ color:var(--muted); font-size:.8rem; margin-left:6px; }
+ .cta{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; align-items:center; }
+ .copybox{ display:inline-flex; align-items:center; gap:12px; background:var(--code); border:1px solid var(--border);
+   border-radius:10px; padding:10px 12px 10px 16px; font-size:.9rem; }
+ .copybox .cmd{ color:var(--ink); } .copybox .pfx{ color:var(--accent); }
+ .copybtn{ cursor:pointer; background:var(--surface); border:1px solid var(--border); color:var(--muted);
+   border-radius:7px; padding:4px 9px; font-size:.74rem; font-family:inherit; white-space:nowrap; }
+ .copybtn:hover{ color:var(--ink); border-color:var(--accent); }
+ .btn{ background:var(--accent); color:#fff; padding:10px 18px; border-radius:10px; font-weight:600; font-size:.92rem; box-shadow:var(--shadow); }
+ .btn:hover{ color:#fff; filter:brightness(1.06); }
 
-  pre.block {
-    background: var(--code-bg); border-left: 3px solid var(--accent);
-    padding: 16px 18px; overflow-x: auto; line-height: 1.55; margin: 14px 0;
-  }
-  pre.block .k { color: var(--accent); font-weight: 600; }
-  pre.block .c { color: var(--muted); font-style: italic; }
+ /* sections */
+ section{ padding-top:46px; margin-top:20px; border-top:1px solid var(--border); }
+ section:first-of-type{ border-top:none; }
+ .eyebrow{ font-size:.74rem; text-transform:uppercase; letter-spacing:.13em; color:var(--accent); font-weight:700; }
+ h2{ font-size:1.62rem; letter-spacing:-.02em; font-weight:800; margin:5px 0 8px; }
+ h3{ font-size:1rem; font-weight:700; margin:26px 0 8px; color:var(--ink); }
+ p{ margin:12px 0; } .lead{ font-size:1.06rem; }
+ b, strong{ font-weight:650; }
+ em.term{ font-style:normal; font-weight:600; color:var(--accent); }
 
-  table { border-collapse: collapse; width: 100%; margin: 14px 0; font-size: 0.92em; }
-  th, td { text-align: left; padding: 7px 10px 7px 0; vertical-align: top; }
-  thead th {
-    font-family: "Source Sans 3", sans-serif; font-size: 0.82rem;
-    border-top: 2px solid var(--fg); border-bottom: 1px solid var(--fg);
-  }
-  tbody tr:last-child td { border-bottom: 2px solid var(--fg); }
-  tbody td { border-bottom: 1px solid var(--rule); }
-  td code { white-space: nowrap; }
-  .tbl-scroll { overflow-x: auto; }
+ /* code */
+ pre{ position:relative; background:var(--code); border:1px solid var(--border); border-radius:12px;
+   padding:16px 18px; overflow-x:auto; font-size:.83rem; line-height:1.6; margin:16px 0; }
+ pre .k{ color:var(--accent); font-weight:600; } pre .c{ color:var(--faint); font-style:italic; }
+ pre .copybtn{ position:absolute; top:9px; right:9px; opacity:0; transition:opacity .12s; }
+ pre:hover .copybtn{ opacity:1; }
+ code:not(pre code){ background:var(--code); border:1px solid var(--border); border-radius:5px; padding:.06em .34em; font-size:.85em; white-space:nowrap; }
 
-  .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; }
-  @media (max-width: 700px) { .duo { grid-template-columns: 1fr; } }
-  figure.page-shot { border: 1px solid var(--rule); background: var(--card); padding: 8px; }
-  figure.page-shot img { width: 100%; display: block; }
-  figure.page-shot figcaption {
-    font-family: "Source Sans 3", sans-serif; font-size: 0.82rem; color: var(--muted);
-    padding-top: 8px; text-align: center;
-  }
-  figcaption b.key { color: var(--key); }
+ /* tables */
+ .tbl-scroll{ overflow-x:auto; border:1px solid var(--border); border-radius:12px; margin:16px 0; box-shadow:var(--shadow); }
+ table{ border-collapse:collapse; width:100%; font-size:.9rem; }
+ th,td{ text-align:left; padding:10px 14px; vertical-align:top; border-bottom:1px solid var(--border); }
+ thead th{ font-size:.72rem; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); background:var(--code); }
+ tbody tr:last-child td{ border-bottom:none; }
+ td code{ white-space:nowrap; }
 
-  .gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-  @media (max-width: 820px) { .gallery { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 540px) { .gallery { grid-template-columns: 1fr; } }
-  .gallery figure { border: 1px solid var(--rule); background: var(--card); padding: 7px; margin: 0; }
-  .gallery img { width: 100%; display: block; border: 1px solid var(--rule); }
-  .gallery figcaption { font-family: "Source Sans 3", sans-serif; font-size: 0.8rem; padding-top: 7px; }
-  .gallery figcaption b { display: block; font-size: 0.85rem; }
-  .gallery figcaption a { text-decoration: none; }
+ /* figures / previews */
+ .duo{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:20px 0; }
+ @media (max-width:700px){ .duo{ grid-template-columns:1fr; } }
+ figure.shot{ margin:0; border:1px solid var(--border); background:var(--surface); border-radius:12px; padding:9px; box-shadow:var(--shadow); }
+ figure.shot img{ width:100%; display:block; border-radius:7px; border:1px solid var(--border); }
+ figure.shot figcaption{ font-size:.82rem; color:var(--muted); padding:9px 4px 3px; text-align:center; }
+ figcaption b{ color:var(--ink); } figcaption b.key{ color:var(--accent2); }
 
-  ol.inv { padding-left: 22px; }
-  ol.inv li { margin: 7px 0; }
-  ol.inv b { font-weight: 600; }
+ /* gallery */
+ .gallery{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin:20px 0; }
+ @media (max-width:820px){ .gallery{ grid-template-columns:repeat(2,1fr); } }
+ @media (max-width:540px){ .gallery{ grid-template-columns:1fr; } }
+ .gcard{ display:block; border:1px solid var(--border); background:var(--surface); border-radius:12px;
+   padding:9px; box-shadow:var(--shadow); transition:transform .14s ease,border-color .14s ease; }
+ .gcard:hover{ transform:translateY(-3px); border-color:var(--accent); }
+ .gcard img{ width:100%; display:block; border-radius:7px; border:1px solid var(--border); }
+ .gcard .cap{ padding:9px 5px 4px; }
+ .gcard .cap b{ display:block; color:var(--ink); font-size:.92rem; }
+ .gcard .cap span{ color:var(--muted); font-size:.8rem; } .gcard .cap .go{ color:var(--accent); font-size:.78rem; font-weight:600; }
 
-  .bibtex { background: var(--code-bg); padding: 14px 16px; overflow-x: auto; border: 1px solid var(--rule); }
-  footer {
-    margin: 72px 0 40px; padding-top: 12px; border-top: 2px solid var(--fg);
-    font-family: "Source Sans 3", sans-serif; font-size: 0.85rem; color: var(--muted);
-    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;
-  }
+ /* invariants */
+ ol.inv{ padding-left:0; list-style:none; counter-reset:inv; display:grid; gap:12px; margin:16px 0; }
+ ol.inv li{ counter-increment:inv; position:relative; padding:14px 16px 14px 52px; background:var(--surface);
+   border:1px solid var(--border); border-radius:12px; box-shadow:var(--shadow); }
+ ol.inv li::before{ content:counter(inv); position:absolute; left:14px; top:14px; width:26px; height:26px;
+   background:var(--accent); color:#fff; border-radius:7px; display:grid; place-items:center; font-size:.82rem; font-weight:700; }
+ ol.inv b{ font-weight:700; }
+
+ .callout{ background:var(--keytint); border:1px solid var(--border); border-left:3px solid var(--accent2);
+   border-radius:10px; padding:12px 16px; margin:16px 0; font-size:.94rem; }
+
+ footer{ margin-top:60px; border-top:1px solid var(--border); }
+ footer .row{ max-width:1000px; margin:0 auto; padding:26px 24px 48px; color:var(--muted); font-size:.87rem;
+   display:flex; gap:14px; flex-wrap:wrap; align-items:center; }
+ footer a{ color:var(--muted); font-weight:600; } footer a:hover{ color:var(--accent); }
 </style>
 </head>
 <body>
-<div class="page">
 
-<header class="masthead">
-  <h1>quizforge</h1>
-  <p class="sub">Deterministic, randomized exam sets from a single plain-Typst master —
-    with auto-generated answer keys and machine-readable grading data.</p>
-  <div class="meta-line">
-    <span>Nipun Batra · IIT Gandhinagar</span>
-    <span>Typst ≥ 0.13 · MIT license · v0.1.0</span>
-    <a href="https://github.com/nipunbatra/quizforge">Source ↗</a>
-    <a href="https://github.com/nipunbatra/quizforge/blob/main/SPEC.md">Specification ↗</a>
+<nav><div class="row">
+  <a href="index.html" class="brand">quizforge<span class="dot">.</span></a>
+  <div class="navpk">
+    <a href="#overview">overview</a>
+    <a href="#design">design</a>
+    <a href="#gallery">gallery</a>
+    <a href="features.html">features&nbsp;↗</a>
+    <a href="#reference">reference</a>
+    <a href="#grading">grading</a>
+    <a href="#guarantees">testing</a>
+  </div>
+  <a class="ghlink" href="https://github.com/nipunbatra/quizforge">GitHub&nbsp;↗</a>
+  <button class="themetoggle" onclick="var d=document.documentElement,n=(d.getAttribute('data-theme')==='dark')?'light':'dark';d.setAttribute('data-theme',n);localStorage.setItem('qf-theme',n);" aria-label="Toggle theme">◑</button>
+</div></nav>
+
+<div class="wrap">
+
+<header class="hero">
+  <h1>quizforge<span class="dot">.</span></h1>
+  <p class="lede">Write an exam once as a <em>plain Typst document</em>. Get N deterministically
+    shuffled sets, matching answer keys, and machine-readable grading data — the master
+    <em>is</em> the answer key.</p>
+  <div class="stats">
+    <div class="stat"><b>480</b><span>checks</span></div>
+    <div class="stat"><b>8</b><span>demo exams</span></div>
+    <div class="stat"><b>0</b><span>dependencies</span></div>
+    <div class="stat"><b>MIT</b><span>licensed</span></div>
+  </div>
+  <div class="cta">
+    <span class="copybox"><span class="cmd"><span class="pfx">$</span> make install-local</span>
+      <button class="copybtn" data-copy="make install-local">copy</button></span>
+    <a class="btn" href="#start">Get started</a>
   </div>
 </header>
-<nav class="toc">
-  <a href="#overview">1 Overview</a>
-  <a href="#design">2 Design</a>
-  <a href="#gallery">3 Gallery</a>
-  <a href="features.html">Feature tour ↗</a>
-  <a href="#reference">4 Reference</a>
-  <a href="#grading">5 Grading</a>
-  <a href="#guarantees">6 Guarantees &amp; testing</a>
-  <a href="#start">7 Getting started</a>
-</nav>
 
 <section id="overview">
-  <h2><span class="no">1</span>Overview</h2>
-  <p class="abstract">
-    Distributing multiple shuffled versions of an exam is standard practice in large
-    courses, but doing it by hand is error-prone precisely where errors are most costly:
-    answer keys drift from papers, sets end up with different questions, and nobody can
-    reconstruct which shuffle went to print. <b>quizforge</b> treats the exam as a pure
-    function: the paper setter writes one ordinary Typst document, and every set —
-    question order, MCQ option order, answer key, grading table — is derived
-    deterministically from it. The master compiles, as-is, into the answer key;
-    <code>--input set=B --input mode=exam</code> yields the corresponding student paper.
+  <div class="eyebrow">01 · Overview</div>
+  <h2>The exam as a pure function</h2>
+  <p class="lead">
+    Distributing multiple shuffled versions of an exam is standard in large courses, but
+    doing it by hand is error-prone exactly where mistakes cost the most: keys drift from
+    papers, sets end up with different questions, and nobody can reconstruct which shuffle
+    went to print. <b>quizforge</b> treats the exam as a pure function — the setter writes
+    one ordinary Typst document, and every set (question order, MCQ option order, answer
+    key, grading table) is derived deterministically from it.
   </p>
-
-  <p>A complete, minimal master — this entire file is a working quiz:</p>
-  <pre class="block"><span class="k">#import</span> "@preview/quizforge:0.1.0": *
+  <p>The master compiles, as-is, into the <b>answer key</b>;
+    <code>--input set=B --input mode=exam</code> yields the corresponding student paper.
+    A complete, minimal master — this entire snippet is a working quiz:</p>
+  <pre><button class="copybtn" data-copy-pre>copy</button><span class="k">#import</span> "@preview/quizforge:0.1.0": *
 
 <span class="k">#show</span>: quiz.with(
   id: "quiz-1",                  <span class="c">// seeds the shuffles — freeze once printed</span>
@@ -176,18 +206,17 @@
     $nabla L = -2 X^T (y - X theta) = 0 arrow.r.double hat(theta) = (X^T X)^(-1) X^T y$]</pre>
 
   <p>Question types are inferred (options → MCQ; <code>#blank[…]</code> → fill-in-the-blank;
-  otherwise subjective with an answer space). Marks totals, per-part subtotals, cover
-  page, set codes, and the MCQ answer grid are computed — the author never does
-  arithmetic. Structural mistakes (no option marked correct, a blank without an answer,
-  prose stranded between shuffled questions) <em>fail compilation</em> with a message
-  naming the question.</p>
+  otherwise subjective with an answer space). Marks totals, per-part subtotals, cover page,
+  set codes, and the MCQ answer grid are all computed — the author never does arithmetic.
+  Structural mistakes (no option marked correct, a blank without an answer, prose stranded
+  between shuffled questions) <b>fail compilation</b> with a message naming the question.</p>
 
   <div class="duo">
-    <figure class="page-shot">
+    <figure class="shot">
       <img src="assets/es335-quiz-1-exam-1.png" alt="Student paper, page 1" loading="lazy">
       <figcaption><b>Student paper</b> (set A) — cover, instructions, answer grid</figcaption>
     </figure>
-    <figure class="page-shot">
+    <figure class="shot">
       <img src="assets/es335-quiz-1-key-2.png" alt="Answer key, page 2" loading="lazy">
       <figcaption><b class="key">Answer key</b> — ✓ options, filled blanks, model answers, rubrics</figcaption>
     </figure>
@@ -195,12 +224,13 @@
 </section>
 
 <section id="design">
-  <h2><span class="no">2</span>Design: randomness as a hash, not an accident</h2>
-  <p>All randomization derives from FNV-1a hashes of explicit strings, fed to an
-  xorshift32 Fisher–Yates shuffle implemented in pure Typst — no clocks, no operating
-  system entropy, no package dependencies. Rebuilding an exam tomorrow, on another
-  machine, or in CI reproduces it byte-for-byte (the test suite pins a golden CSV and a
-  golden question order that must match across macOS and Linux).</p>
+  <div class="eyebrow">02 · Design</div>
+  <h2>Randomness as a hash, not an accident</h2>
+  <p>All randomization derives from FNV-1a hashes of explicit strings, fed to an xorshift32
+  Fisher–Yates shuffle implemented in pure Typst — no clocks, no OS entropy, no package
+  dependencies. Rebuilding an exam tomorrow, on another machine, or in CI reproduces it
+  byte-for-byte (the test suite pins a golden CSV and a golden question order that must
+  match across macOS and Linux).</p>
   <div class="tbl-scroll">
   <table>
     <thead><tr><th>Randomized quantity</th><th>Seed</th><th>Consequence</th></tr></thead>
@@ -221,64 +251,49 @@
 </section>
 
 <section id="gallery">
-  <h2><span class="no">3</span>Gallery: eight papers, one grammar</h2>
+  <div class="eyebrow">03 · Gallery</div>
+  <h2>Eight papers, one grammar</h2>
   <p>Each card links to the full set-A paper and key. Question bodies are ordinary Typst
-  content: tables, native figures, code listings, chemical formulas, matrices — and
+  content — tables, native figures, code listings, chemical formulas, matrices — and
   third-party packages (cetz, unify, physica) work inside questions, options, and blanks.</p>
   <div class="gallery">
-    <figure>
+    <a class="gcard" href="exam/es335-quiz-1.html">
       <img src="assets/es335-quiz-1-exam-2.png" alt="Machine learning quiz" loading="lazy">
-      <figcaption><b>Machine Learning</b>kNN &amp; loss-curve figures, confusion matrix
-        · <a href="exam/es335-quiz-1.html">all versions ↗</a></figcaption>
-    </figure>
-    <figure>
+      <span class="cap"><b>Machine Learning</b><span>kNN &amp; loss-curve figures, confusion matrix</span> <span class="go">all versions ↗</span></span></a>
+    <a class="gcard" href="exam/es335-2023-archive.html">
       <img src="assets/es335-2023-archive-key-2.png" alt="2023 archive quiz" loading="lazy">
-      <figcaption><b>ML 2023 archive</b>real past-paper questions, ported
-        · <a href="exam/es335-2023-archive.html">all versions ↗</a></figcaption>
-    </figure>
-    <figure>
+      <span class="cap"><b>ML 2023 archive</b><span>real past-paper questions, ported</span> <span class="go">all versions ↗</span></span></a>
+    <a class="gcard" href="exam/ph101-demo.html">
       <img src="assets/ph101-demo-exam-1.png" alt="Physics quiz" loading="lazy">
-      <figcaption><b>Physics</b>projectile figure, SI units, derivation
-        · <a href="exam/ph101-demo.html">all versions ↗</a></figcaption>
-    </figure>
-    <figure>
+      <span class="cap"><b>Physics</b><span>projectile figure, SI units, derivation</span> <span class="go">all versions ↗</span></span></a>
+    <a class="gcard" href="exam/ch101-demo.html">
       <img src="assets/ch101-demo-key-1.png" alt="Chemistry quiz" loading="lazy">
-      <figcaption><b>Chemistry</b>formulas, two-blank equation balancing
-        · <a href="exam/ch101-demo.html">all versions ↗</a></figcaption>
-    </figure>
-    <figure>
+      <span class="cap"><b>Chemistry</b><span>formulas, two-blank equation balancing</span> <span class="go">all versions ↗</span></span></a>
+    <a class="gcard" href="exam/cs201-demo.html">
       <img src="assets/cs201-demo-exam-1.png" alt="Algorithms quiz" loading="lazy">
-      <figcaption><b>Algorithms</b>code traces, true/false, master theorem
-        · <a href="exam/cs201-demo.html">all versions ↗</a></figcaption>
-    </figure>
-    <figure>
+      <span class="cap"><b>Algorithms</b><span>code traces, true/false, master theorem</span> <span class="go">all versions ↗</span></span></a>
+    <a class="gcard" href="exam/ma102-demo.html">
       <img src="assets/ma102-demo-key-1.png" alt="Linear algebra quiz" loading="lazy">
-      <figcaption><b>Linear Algebra</b>matrices, multi-select, proof rubric
-        · <a href="exam/ma102-demo.html">all versions ↗</a></figcaption>
-    </figure>
-    <figure>
+      <span class="cap"><b>Linear Algebra</b><span>matrices, multi-select, proof rubric</span> <span class="go">all versions ↗</span></span></a>
+    <a class="gcard" href="exam/ec101-demo.html">
       <img src="assets/ec101-demo-exam-1.png" alt="Economics quiz" loading="lazy">
-      <figcaption><b>Economics</b>supply–demand figure, elasticity table, essay
-        · <a href="exam/ec101-demo.html">all versions ↗</a></figcaption>
-    </figure>
-    <figure>
+      <span class="cap"><b>Economics</b><span>supply–demand figure, elasticity table, essay</span> <span class="go">all versions ↗</span></span></a>
+    <a class="gcard" href="features.html">
       <img src="assets/qf-feature-tour-key-1.png" alt="Feature tour" loading="lazy">
-      <figcaption><b>Feature tour</b>every capability, one question each, with code
-        · <a href="features.html">snippets ↗</a> · <a href="exam/qf-feature-tour.html">versions ↗</a></figcaption>
-    </figure>
+      <span class="cap"><b>Feature tour</b><span>every capability, one question each, with code</span> <span class="go">snippets ↗</span></span></a>
   </div>
 </section>
 
 <section id="reference">
-  <h2><span class="no">4</span>Reference</h2>
-  <h3>Document grammar</h3>
+  <div class="eyebrow">04 · Reference</div>
+  <h2>The document grammar</h2>
   <p><code>=</code> headings open parts (text under a heading becomes that part's
   instructions) · <code>+</code> items are questions · <code>-</code> items are options ·
   <code>✓</code>/<code>✔</code>/<code>#yes</code> marks correct options (two ✓ → multi-select
   automatically) · “None/All/Both of the above” options pin to the last position
-  automatically · large quizzes may span files via <code>#include</code>.</p>
-  <p>The <a href="features.html"><b>feature tour</b></a> shows every capability below
-  as a minimal code snippet next to its rendered output.</p>
+  automatically · large quizzes may span files via <code>#include</code>. The
+  <a href="features.html"><b>feature tour</b></a> shows every capability below as a minimal
+  code snippet next to its rendered output.</p>
   <h3>Inline markers</h3>
   <div class="tbl-scroll">
   <table>
@@ -296,8 +311,8 @@
   </table>
   </div>
   <h3>Exam parameters</h3>
-  <p><code>quiz.with(id, course, title, date, duration, sets, answer-grid,
-  instructions, answer-space, header, footer)</code> — <code>header</code>/<code>footer</code> accept
+  <p><code>quiz.with(id, course, title, date, duration, sets, answer-grid, instructions,
+  answer-space, header, footer)</code> — <code>header</code>/<code>footer</code> accept
   <code>auto</code> (generated), <code>none</code>, fixed content, or a function of
   <code>(exam, set, mode, total)</code>. A second, constructor-based front-end
   (<code>make-exam</code> with <code>mcq()/fib()/subj()</code>, topic/difficulty filters
@@ -306,10 +321,11 @@
 </section>
 
 <section id="grading">
-  <h2><span class="no">5</span>Grading workflow</h2>
+  <div class="eyebrow">05 · Grading</div>
+  <h2>Every answer, as data</h2>
   <p>Every compiled document embeds a pure-data <code>&lt;answerkey&gt;</code> node
-  (<code>typst query</code> exports it; the student PDF never contains answers). The
-  build tool aggregates all sets into <code>answer_key.csv</code>:</p>
+  (<code>typst query</code> exports it; the student PDF never contains answers). The build
+  tool aggregates all sets into <code>answer_key.csv</code>:</p>
   <div class="tbl-scroll">
   <table>
     <thead><tr><th>exam_id</th><th>set</th><th>qno</th><th>question_id</th><th>type</th><th>marks</th><th>answer</th><th>option_order</th></tr></thead>
@@ -322,46 +338,48 @@
   </div>
   <p>Grade MCQs by joining student responses on <code>(set, qno)</code>;
   <code>option_order</code> records each set's full permutation for audit. A
-  <code>manifest.json</code> stores the SHA-256 of every PDF, proving which files went
-  to print. <a href="pdf/answer_key.csv">Sample CSV ↗</a></p>
+  <code>manifest.json</code> stores the SHA-256 of every PDF, proving which files went to
+  print. <a href="pdf/answer_key.csv">Sample CSV ↗</a></p>
 </section>
 
 <section id="guarantees">
-  <h2><span class="no">6</span>Guarantees &amp; testing</h2>
+  <div class="eyebrow">06 · Guarantees &amp; testing</div>
+  <h2>What the build refuses to ship</h2>
   <ol class="inv">
     <li><b>Determinism.</b> Sets are pure functions of (exam id, set id, question identity);
-      rebuilds are byte-identical, across platforms. Golden files pin a full grading CSV
-      and a realized question order; CI re-derives them on Linux.</li>
-    <li><b>Fairness.</b> Every set contains exactly the same questions and total marks;
-      only order differs. Verified for every exam in the repository, every set.</li>
+      rebuilds are byte-identical, across platforms. Golden files pin a full grading CSV and
+      a realized question order; CI re-derives them on Linux.</li>
+    <li><b>Fairness.</b> Every set contains exactly the same questions and total marks; only
+      order differs. Verified for every exam in the repository, every set.</li>
     <li><b>Key correctness.</b> Printed answer letters, mapped through each set's recorded
-      permutation, land on exactly the originally-correct options — re-checked
-      independently by the build tool at every build.</li>
+      permutation, land on exactly the originally-correct options — re-checked independently
+      by the build tool at every build.</li>
     <li><b>Compile-time validation.</b> 37 classes of authoring mistakes are rejected at
       compilation with messages naming the offending question.</li>
   </ol>
-  <p>The suite currently runs <b>480 checks</b>: an invariant matrix over every set of
-  every exam in the repository; a 24-seed structural fuzzer that generates random exams
-  (section counts, question types, option counts, pins, multi-select, fractional marks,
-  sampled sections) and re-verifies all invariants; RNG position-uniformity with a pinned
-  hash regression; 100-question papers under a time budget; third-party package content
-  (cetz, unify, physica) in questions, options, and blanks; CSV escaping round-trips;
-  and byte-reproducibility of PDFs.</p>
+  <p>The suite currently runs <b>480 checks</b>: an invariant matrix over every set of every
+  exam in the repository; a 24-seed structural fuzzer that generates random exams (section
+  counts, question types, option counts, pins, multi-select, fractional marks, sampled
+  sections) and re-verifies all invariants; RNG position-uniformity with a pinned hash
+  regression; 100-question papers under a time budget; third-party package content (cetz,
+  unify, physica) in questions, options, and blanks; CSV escaping round-trips; and
+  byte-reproducibility of PDFs.</p>
 </section>
 
 <section id="start">
-  <h2><span class="no">7</span>Getting started</h2>
-  <pre class="block">git clone https://github.com/nipunbatra/quizforge
+  <div class="eyebrow">07 · Getting started</div>
+  <h2>Three commands</h2>
+  <pre><button class="copybtn" data-copy-pre>copy</button>git clone https://github.com/nipunbatra/quizforge
 cd quizforge
 make install-local          <span class="c"># @local/quizforge:0.1.0, usable from any project</span>
 make watch                  <span class="c"># live preview while writing (the master = the key)</span>
 make build EXAM=exams/quiz3.typ   <span class="c"># all sets + keys + answer_key.csv + manifest</span></pre>
-  <p>Requires <a href="https://typst.app">Typst</a> ≥ 0.13; the Python tooling
-  (build/tests) is optional and uses only the standard library. Publication to
+  <p>Requires <a href="https://typst.app">Typst</a> ≥ 0.13; the Python tooling (build/tests)
+  is optional and uses only the standard library. Publication to
   <a href="https://typst.app/universe">Typst Universe</a> is planned as
   <code>@preview/quizforge</code>; the package directory is submission-ready.</p>
   <h3>Citing</h3>
-  <pre class="bibtex">@software{quizforge2026,
+  <pre><button class="copybtn" data-copy-pre>copy</button>@software{quizforge2026,
   author = {Batra, Nipun},
   title  = {quizforge: deterministic randomized exam sets in Typst},
   year   = {2026},
@@ -369,10 +387,27 @@ make build EXAM=exams/quiz3.typ   <span class="c"># all sets + keys + answer_key
 }</pre>
 </section>
 
-<footer>
-  <span>MIT licensed · built with Typst</span>
-  <span><a href="https://nipunbatra.github.io">Nipun Batra</a> · Sustainability and Computer Systems Lab, IIT Gandhinagar</span>
-</footer>
 </div>
+
+<footer><div class="row">
+  <span>MIT-licensed · built with <a href="https://typst.app">Typst</a> · zero dependencies</span>
+  <span style="flex:1"></span>
+  <a href="https://github.com/nipunbatra/quizforge">source</a>
+  <a href="https://nipunbatra.github.io">Nipun Batra</a>
+  <span>Sustainability &amp; Computer Systems Lab, IIT Gandhinagar</span>
+</div></footer>
+
+<script>
+document.addEventListener("click", function(e){
+  var b = e.target.closest(".copybtn"); if(!b) return;
+  var text = b.hasAttribute("data-copy-pre")
+    ? b.parentNode.innerText.replace(/^\s*copy\s*/, "")
+    : b.getAttribute("data-copy");
+  navigator.clipboard.writeText(text.trim()).then(function(){
+    var o = b.textContent; b.textContent = "copied ✓";
+    setTimeout(function(){ b.textContent = o; }, 1200);
+  });
+});
+</script>
 </body>
 </html>
