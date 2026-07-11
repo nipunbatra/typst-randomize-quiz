@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>quizforge — randomized exam sets in pure Typst</title>
+<meta name="description" content="Write an exam as a plain Typst document; get randomized sets, answer keys, and a grading CSV — deterministically.">
+<style>
+  :root {
+    --bg: #faf9f6; --fg: #1d1d1f; --muted: #6b6b6f; --accent: #0a7d33;
+    --card: #ffffff; --border: #e4e2dc; --code-bg: #f2f0ea; --key: #b3261e;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #131313; --fg: #ececec; --muted: #9a9a9e; --accent: #4cc474;
+      --card: #1c1c1e; --border: #2c2c2e; --code-bg: #1f1f21; --key: #ff7a70;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    background: var(--bg); color: var(--fg);
+    font: 17px/1.65 ui-serif, "Iowan Old Style", Georgia, serif;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 0 24px; }
+  header { padding: 88px 0 48px; text-align: center; }
+  h1 { font-size: clamp(2.4rem, 6vw, 3.6rem); letter-spacing: -0.02em; }
+  h1 .forge { color: var(--accent); }
+  .tagline { font-size: 1.2rem; color: var(--muted); max-width: 620px; margin: 14px auto 0; }
+  .badges { margin-top: 22px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .badges a {
+    font: 600 0.85rem/1 ui-sans-serif, system-ui, sans-serif;
+    color: var(--fg); text-decoration: none; padding: 9px 16px;
+    border: 1px solid var(--border); border-radius: 999px; background: var(--card);
+  }
+  .badges a.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  h2 {
+    font: 700 0.8rem/1 ui-sans-serif, system-ui, sans-serif; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--muted); margin: 64px 0 18px;
+  }
+  .duo { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+  @media (max-width: 760px) { .duo { grid-template-columns: 1fr; } }
+  pre {
+    background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px;
+    padding: 18px 20px; overflow-x: auto;
+    font: 0.82rem/1.55 ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  pre .c { color: var(--muted); } pre .k { color: var(--accent); font-weight: 600; }
+  .arrow-note { font-style: italic; color: var(--muted); text-align: center; padding: 8px 0; }
+  .shots { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 760px) { .shots { grid-template-columns: 1fr; } }
+  figure { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 10px; }
+  figure img { width: 100%; display: block; border-radius: 6px; }
+  figcaption {
+    font: 0.85rem/1.4 ui-sans-serif, system-ui, sans-serif;
+    color: var(--muted); padding: 10px 6px 4px; text-align: center;
+  }
+  figcaption b.key { color: var(--key); }
+  ul.features { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 14px 26px; }
+  @media (max-width: 760px) { ul.features { grid-template-columns: 1fr; } }
+  ul.features li { padding-left: 26px; position: relative; }
+  ul.features li::before { content: "✓"; position: absolute; left: 0; color: var(--accent); font-weight: 700; }
+  ul.features b { font-family: ui-sans-serif, system-ui, sans-serif; font-size: 0.95em; }
+  .files a { color: var(--accent); }
+  table.dl { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+  table.dl td { padding: 9px 8px; border-bottom: 1px solid var(--border); }
+  table.dl td:first-child { font-weight: 600; font-family: ui-sans-serif, system-ui, sans-serif; font-size: 0.9rem; }
+  table.dl a { color: var(--accent); text-decoration: none; }
+  table.dl a:hover { text-decoration: underline; }
+  footer { margin: 80px 0 40px; text-align: center; color: var(--muted); font-size: 0.9rem; }
+  footer a { color: var(--accent); }
+</style>
+</head>
+<body>
+<header class="wrap">
+  <h1>quiz<span class="forge">forge</span></h1>
+  <p class="tagline">Write an exam as a <em>plain Typst document</em>. Get randomized
+  sets, answer keys, and a grading CSV — deterministically, forever.</p>
+  <div class="badges">
+    <a class="primary" href="https://github.com/nipunbatra/typst-randomize-quiz">GitHub</a>
+    <a href="https://github.com/nipunbatra/typst-randomize-quiz/blob/main/quizforge/README.md">Documentation</a>
+    <a href="https://github.com/nipunbatra/typst-randomize-quiz/blob/main/SPEC.md">Design spec</a>
+    <a href="pdf/answer_key.csv">Sample grading CSV</a>
+  </div>
+</header>
+
+<main class="wrap">
+  <h2>You write this</h2>
+  <pre><span class="k">#show</span>: quiz.with(id: "es335-quiz-1", course: "ES 335: Machine Learning",
+                sets: ("A", "B", "C", "D"), answer-grid: true)
+
+<span class="k">=</span> Multiple Choice
+
++ <span class="k">#m(2)</span> Increasing $k$ in $k$-NN typically has which effect?
+  - <span class="k">✓</span> Increases bias, decreases variance
+  - Decreases bias, increases variance
+  - None of the above          <span class="c">// auto-pinned last</span>
+
+<span class="k">=</span> Fill in the Blanks
+
++ <span class="k">#m(1)</span> Computing inner products in feature space without
+  constructing features is the kernel <span class="k">#blank[trick]</span>.</pre>
+  <p class="arrow-note">…compiled as-is it renders the answer key; each
+  <code>--input set=…</code> is a different randomized paper.</p>
+
+  <h2>Students get these</h2>
+  <div class="shots">
+    <figure>
+      <img src="assets/quiz3-exam-1.png" alt="Student paper, set A, page 1" loading="lazy">
+      <img src="assets/quiz3-exam-2.png" alt="Student paper, set A, page 2" loading="lazy" style="margin-top:10px">
+      <figcaption><b>Student paper</b> — set code on every page, answer grid, shuffled questions &amp; options</figcaption>
+    </figure>
+    <figure>
+      <img src="assets/quiz3-key-1.png" alt="Answer key, set A, page 1" loading="lazy">
+      <img src="assets/quiz3-key-2.png" alt="Answer key, set A, page 2" loading="lazy" style="margin-top:10px">
+      <figcaption><b class="key">Answer key</b> — ✓ options, filled blanks, model answers, rubrics, pre-filled grid</figcaption>
+    </figure>
+  </div>
+
+  <h2>Why it's safe to trust with a real exam</h2>
+  <ul class="features">
+    <li><b>Deterministic.</b> Sets are pure functions of (quiz id, set id, question) — rebuilds are byte-identical. No clocks, no OS randomness, no dependencies.</li>
+    <li><b>Fair by construction.</b> Every set has the same questions and total marks; only order differs. Bank sampling can't diverge across sets.</li>
+    <li><b>Keys can't drift.</b> Paper, key PDF, and grading CSV derive from one structure — and the build re-verifies every letter↔option mapping.</li>
+    <li><b>Validation = compilation.</b> No ✓ marked, blank/answer mismatch, stranded prose between shuffled questions… all fail the build, naming the question.</li>
+    <li><b>Figures, tables, math.</b> Questions are ordinary Typst content — confusion matrices, plots, code blocks, blanks inside equations all work.</li>
+    <li><b>Tested.</b> 74 pytest cases: determinism, fairness, key correctness, RNG uniformity, 100-question stress papers, 30 exact compile-error messages.</li>
+  </ul>
+
+  <h2>Sample: a real ML quiz, four sets</h2>
+  <table class="dl">
+    <tr><td>Set A</td><td><a href="pdf/set-A.pdf">paper</a> · <a href="pdf/set-A-key.pdf">key</a></td>
+        <td rowspan="4" style="text-align:right; color:var(--muted)">same 12 questions,<br>different order per set</td></tr>
+    <tr><td>Set B</td><td><a href="pdf/set-B.pdf">paper</a> · <a href="pdf/set-B-key.pdf">key</a></td></tr>
+    <tr><td>Set C</td><td><a href="pdf/set-C.pdf">paper</a> · <a href="pdf/set-C-key.pdf">key</a></td></tr>
+    <tr><td>Set D</td><td><a href="pdf/set-D.pdf">paper</a> · <a href="pdf/set-D-key.pdf">key</a></td></tr>
+  </table>
+
+  <h2>Quick start</h2>
+  <pre>git clone https://github.com/nipunbatra/typst-randomize-quiz
+cd typst-randomize-quiz
+make install-local        <span class="c"># @local/quizforge:0.1.0 available everywhere</span>
+make build EXAM=exams/quiz3.typ   <span class="c"># all sets + keys + answer_key.csv</span></pre>
+</main>
+
+<footer class="wrap">
+  MIT licensed · built with <a href="https://typst.app">Typst</a> ·
+  <a href="https://nipunbatra.github.io">Nipun Batra</a>, IIT Gandhinagar
+</footer>
+</body>
+</html>

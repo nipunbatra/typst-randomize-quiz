@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  TYPST_VERSION: "0.14.2"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Typst
+        run: |
+          curl -fsSL "https://github.com/typst/typst/releases/download/v${TYPST_VERSION}/typst-x86_64-unknown-linux-musl.tar.xz" | tar -xJ
+          echo "$PWD/typst-x86_64-unknown-linux-musl" >> "$GITHUB_PATH"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pytest
+      - name: Run test suite
+        run: python -m pytest tests -q
+
+  site:
+    if: github.ref == 'refs/heads/main'
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Typst
+        run: |
+          curl -fsSL "https://github.com/typst/typst/releases/download/v${TYPST_VERSION}/typst-x86_64-unknown-linux-musl.tar.xz" | tar -xJ
+          echo "$PWD/typst-x86_64-unknown-linux-musl" >> "$GITHUB_PATH"
+      - name: Build demo exams
+        run: |
+          python3 scripts/build.py exams/quiz3.typ
+          python3 scripts/build.py exams/quiz2.typ
+      - name: Assemble site
+        run: |
+          mkdir -p _site/assets _site/pdf
+          cp site/index.html _site/
+          cp build/es335-quiz-1/*.pdf build/es335-quiz-1/answer_key.csv _site/pdf/
+          typst compile exams/quiz3.typ "_site/assets/quiz3-exam-{p}.png" \
+            --root . --format png --pages 1-2 --ppi 110 --input set=A --input mode=exam
+          typst compile exams/quiz3.typ "_site/assets/quiz3-key-{p}.png" \
+            --root . --format png --pages 1-2 --ppi 110 --input set=A --input mode=key
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4
