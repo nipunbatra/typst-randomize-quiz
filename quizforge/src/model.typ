@@ -86,6 +86,12 @@
   _check-marks(id, marks)
   let anss = if type(answers) == array { answers } else { (answers,) }
   assert(anss.len() > 0, message: id + ": needs at least one answer, e.g. answers: (\"ReLU\",)")
+  for a in anss {
+    assert(
+      a != [] and (type(a) != str or plaintext(a).trim() != ""),
+      message: id + ": a blank's answer is empty",
+    )
+  }
   assert(type(blank-width) == length, message: id + ": blank-width must be a length, e.g. 2.5cm")
   (
     type: "fill_blank", id: id, body: body, answers: anss, marks: marks,
@@ -139,7 +145,15 @@
   assert(a.pos().len() <= 1, message: "blank() takes at most one answer, e.g. #blank[ReLU]")
   if a.pos().len() == 1 {
     let answer = a.pos().first()
-    metadata((qf: "blank", answer: plaintext(answer)))
+    let ptext = plaintext(answer).trim()
+    assert(
+      answer != [] and (type(answer) != str or ptext != ""),
+      message: "blank[] answer must not be empty",
+    )
+    // Content whose text cannot be extracted statically (e.g. context-based
+    // package output like unify's qty()) still renders in the key PDF; the
+    // grading CSV gets a placeholder instead of an empty cell.
+    metadata((qf: "blank", answer: if ptext == "" { "(see key)" } else { plaintext(answer) }))
     blank-counter.step()
     context _render-blank(answer, width, mode-state.get() == "key")
   } else {

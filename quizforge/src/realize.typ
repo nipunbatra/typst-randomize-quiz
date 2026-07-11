@@ -111,7 +111,13 @@
         }
         entry.insert("answer", letters)
       } else if q.type == "fill_blank" {
-        entry.insert("answer", q.answers.map(plaintext).join("; "))
+        entry.insert(
+          "answer",
+          q.answers.map(a => {
+            let p = plaintext(a)
+            if p.trim() == "" { "(see key)" } else { p }
+          }).join("; "),
+        )
       } else {
         entry.insert("answer", "MANUAL")
       }

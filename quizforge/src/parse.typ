@@ -18,7 +18,16 @@
 #import "model.typ": mcq, fib, subj, opt
 #import "render.typ": make-exam
 
-#let _CHECK = "✓"
+// Accepted correct-option prefixes (plain ✓ and heavy ✔).
+#let _CHECKS = ("✓", "✔")
+
+// If t starts with a checkmark, return the remainder (trimmed); else none.
+#let _strip-prefix(t) = {
+  for c in _CHECKS {
+    if t.starts-with(c) { return t.slice(c.len()).trim(at: start) }
+  }
+  none
+}
 
 // The value dict of a quizforge marker, or none.
 #let _marker(c) = {
@@ -78,12 +87,11 @@
   out
 }
 
-// Detect and strip a leading ✓ from an option body. Returns (found, body).
+// Detect and strip a leading ✓/✔ from an option body. Returns (found, body).
 #let _strip-check(body) = {
   if body.has("text") {
-    if body.text.starts-with(_CHECK) {
-      return (true, text(body.text.slice(_CHECK.len()).trim(at: start)))
-    }
+    let rest = _strip-prefix(body.text)
+    if rest != none { return (true, text(rest)) }
     return (false, body)
   }
   if body.has("children") {
@@ -91,16 +99,18 @@
     let i = 0
     // scan past whitespace AND invisible markers (#pin ✓ Foo must still work)
     while i < ch.len() and (_is-blankish(ch.at(i)) or ch.at(i).func() == metadata) { i += 1 }
-    if i < ch.len() and ch.at(i).has("text") and ch.at(i).text.starts-with(_CHECK) {
-      let rest = ch.at(i).text.slice(_CHECK.len()).trim(at: start)
-      let head = ch.slice(0, i)
-      let tail = ch.slice(i + 1)
-      if rest == "" {
-        // the ✓ was its own word — also swallow the following space
-        if tail.len() > 0 and _is-blankish(tail.first()) { tail = tail.slice(1) }
-        return (true, (head + tail).join())
+    if i < ch.len() and ch.at(i).has("text") {
+      let rest = _strip-prefix(ch.at(i).text)
+      if rest != none {
+        let head = ch.slice(0, i)
+        let tail = ch.slice(i + 1)
+        if rest == "" {
+          // the ✓ was its own word — also swallow the following space
+          if tail.len() > 0 and _is-blankish(tail.first()) { tail = tail.slice(1) }
+          return (true, (head + tail).join())
+        }
+        return (true, (head + (text(rest),) + tail).join())
       }
-      return (true, (head + (text(rest),) + tail).join())
     }
   }
   (false, body)
@@ -112,6 +122,7 @@
 #let _MARKER-NAMES = (
   marks: "m(...)", id: "qid(...)", opts: "opts(...)", explain: "explain[...]",
   answer: "answer(...)", blank: "blank[...]", sec: "section(...)",
+  correct: "yes", fixed: "pin",
 )
 
 #let _parse-option(li, where) = {
@@ -131,7 +142,13 @@
   let stripped = _strip-check(li.body)
   if stripped.at(0) { correct = true }
   let body = stripped.at(1)
-  assert(plaintext(body).trim() != "", message: where + ": an option is empty")
+  // Reject truly empty options ("- ✓" alone) but allow content whose text is
+  // statically opaque (context-based package output such as unify's qty()).
+  let is-empty = (
+    body == none or body == []
+      or (type(body) == content and body.has("text") and body.text.trim() == "")
+  )
+  assert(not is-empty, message: where + ": an option is empty")
   if fixed == none and lower(plaintext(body)).match(_NOTA) != none {
     fixed = "last" // "None of the above" and friends auto-pin to the end
   }
@@ -162,7 +179,17 @@
   let ans-mk = none
   let blanks = ()
   let over = (:)
+  let seen-mk = ()
   for mk in markers {
+    if mk.qf in ("marks", "id", "explain", "answer", "opts") {
+      // repeated #m / #qid / #answer / #opts / #explain on one question is
+      // always an authoring accident — the loser would win silently
+      assert(
+        mk.qf not in seen-mk,
+        message: where + ": #" + _MARKER-NAMES.at(mk.qf) + " appears more than once",
+      )
+      seen-mk.push(mk.qf)
+    }
     if mk.qf == "marks" { marks = mk.v }
     else if mk.qf == "id" { id = mk.v }
     else if mk.qf == "explain" { explanation = mk.v }
@@ -255,7 +282,17 @@
     if type(c) != content or _is-blankish(c) { continue }
     let mk = _marker(c)
     if mk != none {
-      if mk.qf == "sec" { cur.shuffle = mk.v.at("shuffle", default: true) }
+      if mk.qf == "sec" {
+        cur.shuffle = mk.v.at("shuffle", default: true)
+      } else {
+        // A #m(2) drifting between questions would silently change nothing
+        // (the question would keep its default marks) — refuse loudly.
+        assert(
+          false,
+          message: "quizforge: found #" + _MARKER-NAMES.at(mk.qf, default: mk.qf)
+            + " between questions — markers belong inside a question's + item",
+        )
+      }
       continue
     }
     if c.func() == heading {

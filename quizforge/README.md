@@ -89,7 +89,7 @@ typst query exam.typ "<answerkey>" --field value --one --input set=B
 returns question order, correct letters (mapped through each set's
 permutation), fill-in answers, marks, and the full option permutation per
 question — everything needed to grade or to drive external tooling. The
-[repository](https://github.com/nipunbatra/typst-randomize-quiz) ships a
+[repository](https://github.com/nipunbatra/quizforge) ships a
 `build.py` that compiles all sets in parallel, re-verifies the fairness
 invariants, and writes a combined `answer_key.csv` + SHA-256 manifest.
 

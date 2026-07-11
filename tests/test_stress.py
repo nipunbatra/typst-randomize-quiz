@@ -207,3 +207,41 @@ def test_custom_header_footer():
         cwd=ROOT, capture_output=True, text=True,
     )
     assert proc.returncode == 0, proc.stderr
+
+
+# ------------------------------------------------------------ golden files
+
+def test_golden_csv_quiz1(tmp_path):
+    """Byte-stable grading CSV — any change to shuffles, ids, or CSV format
+    must be deliberate (regenerate tests/golden/dl-quiz-1.csv and explain)."""
+    proc = subprocess.run(
+        [sys.executable, "scripts/build.py", "exams/quiz1.typ", "--out", str(tmp_path)],
+        cwd=ROOT, capture_output=True, text=True,
+    )
+    assert proc.returncode == 0, proc.stderr
+    got = (tmp_path / "dl-quiz-1" / "answer_key.csv").read_text()
+    assert got == (ROOT / "tests" / "golden" / "dl-quiz-1.csv").read_text()
+
+
+def test_golden_question_order_quiz3():
+    """Pins the exact realized order of quiz3 set A. Passing on both macOS
+    (dev) and Linux (CI) proves cross-platform determinism of the PRNG."""
+    meta = json.loads(typst_query("A", exam="exams/quiz3.typ"))
+    got = [q["id"] for q in questions_of(meta)]
+    expected = json.loads((ROOT / "tests" / "golden" / "quiz3-setA-order.json").read_text())
+    assert got == expected
+
+
+# ------------------------------------------------------------ CSV escaping
+
+def test_csv_survives_commas_and_quotes(tmp_path):
+    import csv as csvmod
+    proc = subprocess.run(
+        [sys.executable, "scripts/build.py", "tests/fixtures/markup-csv-quoting.typ", "--out", str(tmp_path)],
+        cwd=ROOT, capture_output=True, text=True,
+    )
+    assert proc.returncode == 0, proc.stderr
+    with (tmp_path / "csv-quoting" / "answer_key.csv").open() as f:
+        rows = list(csvmod.DictReader(f))
+    answers = {r["answer"] for r in rows}
+    assert 'comma, "quotes", and; semicolons' in answers

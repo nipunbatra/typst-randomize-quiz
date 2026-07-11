@@ -1,4 +1,4 @@
-# typst-randomize-quiz — home of the `quizforge` package
+# quizforge
 
 Write an exam as a **plain Typst document**; get N randomized sets (question +
 option order shuffled deterministically per set), matching answer keys, and a
@@ -27,7 +27,7 @@ quizforge/            the package (Universe-ready: manifest, license, template, 
 exams/                demos: quiz3.typ (ML, figures+tables) · quiz4-ml23.typ (ported real 2023 papers) · quiz2.typ · quiz1.typ (banks)
 questions/            demo banks for the constructor front-end
 scripts/build.py      all sets ∥ → invariant checks → answer_key.csv + manifest.json
-tests/                78 pytest cases: determinism, fairness, key correctness, error contract
+tests/                399 checks: invariant matrix over every exam×set, 24-seed fuzzer, goldens, error contract
 ```
 
 ```bash

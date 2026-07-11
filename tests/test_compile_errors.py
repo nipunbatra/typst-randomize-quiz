@@ -41,6 +41,12 @@ CASES = [
     ("markup-explain-on-subjective.typ", "only supported on MCQs", []),
     ("too-many-options.typ", "at most 26 options", []),
     ("markup-set-in-body.typ", "move them above the '#show: quiz' line", []),
+    ("markup-stray-marker.typ", "between questions — markers belong inside", []),
+    ("markup-double-marks.typ", "#m(...) appears more than once", []),
+    ("markup-empty-blank.typ", "blank[] answer must not be empty", []),
+    ("empty-fib-answer.typ", "a blank's answer is empty", []),
+    ("empty-sets.typ", "exam.sets must not be empty", []),
+    ("dup-sets.typ", "exam.sets contains duplicates", []),
 ]
 
 

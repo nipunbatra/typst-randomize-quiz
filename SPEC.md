@@ -139,9 +139,10 @@ Parser: no option marked ✓ · empty option/question body · ✓/`#yes`/`#pin` 
 body · options + `#blank` in one question · level-≥2 headings · free content between
 questions · missing quiz id.
 
-## 5. Testing (78 pytest cases, all deterministic)
+## 5. Testing (399 checks, all deterministic)
 
-- **Compile-error contract:** 31 fixtures fail with their exact message.
+- **Compile-error contract:** 37 fixtures fail with their exact message.
+- **Property matrix:** every invariant checked on every set of every exam in the repo (tests/test_properties.py); structural fuzzing over 24 seeded random exams (tests/test_fuzz.py); golden CSV + golden question order pin cross-platform determinism.
 - **Determinism:** metadata byte-identical across runs; PDF bytes reproducible.
 - **Distinctness:** distinct question orders per set; option permutations differ.
 - **Fairness:** same id multiset, totals, contiguous qno; `pick` subset identical.
