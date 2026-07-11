@@ -55,8 +55,12 @@ grid pre-filled. Randomized student papers come from the same file:
 typst compile exam.typ set-B.pdf --input set=B --input mode=exam
 ```
 
-Each set gets a cover page (set code, name/roll fields, computed totals,
-instructions), per-page set headers, and continuous question numbers.
+Each set gets a cover page (set code, name/roll fields, computed totals and
+per-part subtotals, instructions), per-page set headers/footers, and continuous
+question numbers. Page furniture is customizable: `quiz.with(header: none)`
+turns the header off, `footer: [fixed content]` replaces it, and
+`footer: info => [...]` receives `(exam, set, mode, total)` for dynamic
+footers. All marks arithmetic is automatic.
 
 ## How the randomization works
 

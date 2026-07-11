@@ -24,10 +24,10 @@ is a randomized student paper; `scripts/build.py` makes everything at once.
 
 ```
 quizforge/            the package (Universe-ready: manifest, license, template, thumbnail)
-exams/                demo masters: quiz2.typ (plain markup) · quiz1.typ (question banks)
+exams/                demos: quiz3.typ (ML, figures+tables) · quiz4-ml23.typ (ported real 2023 papers) · quiz2.typ · quiz1.typ (banks)
 questions/            demo banks for the constructor front-end
 scripts/build.py      all sets ∥ → invariant checks → answer_key.csv + manifest.json
-tests/                68 pytest cases: determinism, fairness, key correctness, error contract
+tests/                78 pytest cases: determinism, fairness, key correctness, error contract
 ```
 
 ```bash

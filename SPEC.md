@@ -139,9 +139,9 @@ Parser: no option marked ✓ · empty option/question body · ✓/`#yes`/`#pin` 
 body · options + `#blank` in one question · level-≥2 headings · free content between
 questions · missing quiz id.
 
-## 5. Testing (52 pytest cases, all deterministic)
+## 5. Testing (78 pytest cases, all deterministic)
 
-- **Compile-error contract:** 23 fixtures fail with their exact message.
+- **Compile-error contract:** 31 fixtures fail with their exact message.
 - **Determinism:** metadata byte-identical across runs; PDF bytes reproducible.
 - **Distinctness:** distinct question orders per set; option permutations differ.
 - **Fairness:** same id multiset, totals, contiguous qno; `pick` subset identical.
@@ -150,6 +150,10 @@ questions · missing quiz id.
 - **Markup semantics:** ✓ detection, auto multi-select, NOTA auto-pin, hash + `#qid`
   ids, blank extraction (`2 λ θ; decay`), section shuffle freeze, instructions capture.
 - **Outputs:** CSV ↔ metadata field equality; manifest hashes match files.
+- **Stress:** torture markup (unicode, code blocks, tables in options, blanks in
+  math, pinned+✓), 100-question generated paper under a time budget, RNG
+  position-uniformity + hash regression pin, multi-file quizzes via #include,
+  ported real 2023 course papers (exams/quiz4-ml23.typ), custom header/footer.
 
 ## 6. Operational guidance
 

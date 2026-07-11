@@ -31,6 +31,30 @@
 
 #let _children(c) = if c.has("children") { c.children } else { (c,) }
 
+// Flatten the top-level stream: unwrap nested sequences (produced by
+// #include, letting large quizzes span multiple files) and reject styled
+// wrappers (a #set/#show inside the body would silently swallow everything
+// after it — set rules belong above the `#show: quiz` line, where they
+// apply to the whole rendered paper).
+#let _flat-children(body) = {
+  let out = ()
+  for c in _children(body) {
+    if type(c) != content {
+      out.push(c)
+    } else if repr(c.func()) == "sequence" {
+      out += _flat-children(c)
+    } else if repr(c.func()) == "styled" {
+      assert(
+        false,
+        message: "quizforge: #set/#show rules inside the quiz body are not supported — move them above the '#show: quiz' line (they will then style the whole paper)",
+      )
+    } else {
+      out.push(c)
+    }
+  }
+  out
+}
+
 #let _is-blankish(c) = repr(c.func()) in ("space", "parbreak", "linebreak")
 
 // Recursively collect quizforge markers, without descending into list/enum
@@ -227,7 +251,7 @@
     sections
   }
 
-  for c in _children(body) {
+  for c in _flat-children(body) {
     if type(c) != content or _is-blankish(c) { continue }
     let mk = _marker(c)
     if mk != none {
@@ -303,6 +327,8 @@
   sets: ("A",),
   answer-grid: false,
   instructions: (),
+  header: auto, // auto = generated | none = off | content | (info) => content
+  footer: auto, // ditto; info = (exam, set, mode, total)
   body,
 ) = {
   assert(
@@ -317,6 +343,8 @@
     sets: sets,
     "answer-grid": answer-grid,
     instructions: instructions,
+    header: header,
+    footer: footer,
   )
   if date != none { exam.insert("date", date) }
   if duration != none { exam.insert("duration", duration) }

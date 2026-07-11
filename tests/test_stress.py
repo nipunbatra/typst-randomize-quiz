@@ -172,3 +172,38 @@ def test_quiz3_full_build(tmp_path):
     assert meta["total"] == 30
     fib_answers = {q["answer"] for q in questions_of(meta) if q["type"] == "fill_blank"}
     assert "−1; y" in fib_answers  # math blanks extract (unicode minus from $-1$)
+
+
+# ------------------------------------------------------------ multi-file quiz
+
+def test_include_splits_quiz_across_files():
+    """#include'd files are flattened into the question stream."""
+    meta = json.loads(typst_query("A", exam="tests/fixtures/markup-include.typ"))
+    assert [s["title"] for s in meta["sections"]] == ["Part One", "Part Two"]
+    assert len(questions_of(meta)) == 2
+
+
+# ------------------------------------------------------------ ported 2023 quiz
+
+def test_quiz4_ported_archive_builds(tmp_path):
+    """Real 2023 ES 335 questions (tables, quotes, inline code, 0.5-mark
+    questions) build with invariants verified."""
+    proc = subprocess.run(
+        [sys.executable, "scripts/build.py", "exams/quiz4-ml23.typ", "--out", str(tmp_path)],
+        cwd=ROOT, capture_output=True, text=True,
+    )
+    assert proc.returncode == 0, proc.stderr + proc.stdout
+    meta = json.loads(typst_query("D", exam="exams/quiz4-ml23.typ"))
+    assert meta["total"] == 9.0
+    marks = sorted(q["marks"] for q in questions_of(meta))
+    assert marks == [0.5, 1, 1, 1, 1, 1, 1.5, 2]
+
+
+def test_custom_header_footer():
+    """header: none + footer as a function of (exam, set, mode, total)."""
+    proc = subprocess.run(
+        ["typst", "compile", "tests/fixtures/markup-custom-furniture.typ",
+         "/dev/null", "--format", "pdf", "--root", str(ROOT), "--input", "mode=exam"],
+        cwd=ROOT, capture_output=True, text=True,
+    )
+    assert proc.returncode == 0, proc.stderr

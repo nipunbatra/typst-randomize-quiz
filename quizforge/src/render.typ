@@ -147,34 +147,45 @@
   if "duration" in exam { info.push([Duration: #exam.duration]) }
   info.push([Maximum marks: #R.total])
 
+  // Default page furniture; both are overridable via exam.header / exam.footer
+  // (auto = these defaults, none = off, content = fixed, function = called
+  // with (exam, set, mode, total) and may itself use `context`).
+  let default-header = context {
+    if counter(page).get().first() > 1 {
+      grid(
+        columns: (1fr, auto),
+        text(size: 9pt, fill: gray.darken(30%), {
+          exam.at("course", default: "")
+          " — "
+          exam.at("title", default: "")
+        }),
+        text(size: 9pt, weight: "bold", "SET " + set-id),
+      )
+      v(-4pt)
+      line(length: 100%, stroke: 0.4pt + gray)
+    }
+  }
+  let default-footer = context {
+    let p = counter(page).get().first()
+    let t = counter(page).final().first()
+    align(
+      center,
+      text(size: 9pt, fill: gray.darken(30%), "Set " + set-id + "  ·  Page " + str(p) + " of " + str(t)),
+    )
+  }
+  let resolve = (v, default) => {
+    if v == auto { default } else if type(v) == function {
+      v((exam: exam, "set": set-id, mode: mode, total: R.total))
+    } else { v }
+  }
+
   [
     #set document(title: plaintext(exam.at("title", default: exam.id)) + " — Set " + set-id + (if key { " (Answer Key)" } else { "" }))
     #set page(
       paper: "a4",
       margin: (x: 2cm, top: 2.3cm, bottom: 2.3cm),
-      header: context {
-        if counter(page).get().first() > 1 {
-          grid(
-            columns: (1fr, auto),
-            text(size: 9pt, fill: gray.darken(30%), {
-              exam.at("course", default: "")
-              " — "
-              exam.at("title", default: "")
-            }),
-            text(size: 9pt, weight: "bold", "SET " + set-id),
-          )
-          v(-4pt)
-          line(length: 100%, stroke: 0.4pt + gray)
-        }
-      },
-      footer: context {
-        let p = counter(page).get().first()
-        let t = counter(page).final().first()
-        align(
-          center,
-          text(size: 9pt, fill: gray.darken(30%), "Set " + set-id + "  ·  Page " + str(p) + " of " + str(t)),
-        )
-      },
+      header: resolve(exam.at("header", default: auto), default-header),
+      footer: resolve(exam.at("footer", default: auto), default-footer),
     )
     #set text(font: "New Computer Modern", size: 11pt)
     #set par(justify: true)

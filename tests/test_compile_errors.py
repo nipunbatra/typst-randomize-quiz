@@ -40,6 +40,7 @@ CASES = [
     ("markup-sec-in-body.typ", "belongs in a part heading", []),
     ("markup-explain-on-subjective.typ", "only supported on MCQs", []),
     ("too-many-options.typ", "at most 26 options", []),
+    ("markup-set-in-body.typ", "move them above the '#show: quiz' line", []),
 ]
 
 
