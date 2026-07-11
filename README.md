@@ -50,9 +50,9 @@ answer-free student PDFs.
 ⚠️ `id:` (and question wording, unless `#qid`-frozen) seed the shuffles —
 freeze them once a paper is printed, and archive `build/<exam_id>/`.
 
-## Publishing to Typst Universe
+## Typst Universe
 
-`quizforge/` is submission-shaped: copy it to `typst/packages` as
-`packages/preview/quizforge/0.1.0` and open a PR. After acceptance, imports
-become `@preview/quizforge:0.1.0` and `typst init @preview/quizforge`
-scaffolds a new exam from the template.
+Submitted as [typst/packages#5322](https://github.com/typst/packages/pull/5322).
+Once merged, imports become `@preview/quizforge:0.1.0` and
+`typst init @preview/quizforge` scaffolds a new exam from the template.
+Until then, `make install-local` provides `@local/quizforge:0.1.0`.

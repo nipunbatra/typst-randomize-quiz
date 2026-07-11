@@ -8,8 +8,9 @@ description = "Randomized exam sets from one source: shuffle question and MCQ op
 repository = "https://github.com/nipunbatra/quizforge"
 keywords = ["exam", "quiz", "test", "randomization", "mcq", "assessment", "teaching", "answer-key"]
 categories = ["components", "utility"]
-compiler = "0.13.0"
-exclude = []
+disciplines = ["education"]
+compiler = "0.14.0"
+exclude = ["thumbnail.png"]
 
 [template]
 path = "template"
