@@ -1,0 +1,140 @@
+{
+  "quizforge: new quiz scaffold": {
+    "scope": "typst",
+    "prefix": "qf-quiz",
+    "description": "A complete quiz master (compiles as the answer key)",
+    "body": [
+      "#import \"@local/quizforge:0.1.0\": *",
+      "",
+      "#show: quiz.with(",
+      "  id: \"${1:my-quiz-1}\", // seeds the shuffles — freeze once printed",
+      "  course: \"${2:ES 101: Course Name}\",",
+      "  title: \"${3:Quiz 1}\",",
+      "  duration: \"${4:30 minutes}\",",
+      "  sets: (\"A\", \"B\"),",
+      "  answer-grid: true,",
+      ")",
+      "",
+      "= ${5:Multiple Choice}",
+      "",
+      "+ #m(2) ${6:First question}?",
+      "  - ✓ ${7:Correct option}",
+      "  - ${8:Wrong option}",
+      "  - ${9:Wrong option}",
+      "$0"
+    ]
+  },
+  "quizforge: part heading": {
+    "scope": "typst",
+    "prefix": "qf-part",
+    "description": "A new part; text under the heading becomes its instructions",
+    "body": ["= ${1:Part Name}", "", "${2:Instructions for this part.}", "", "$0"]
+  },
+  "quizforge: MCQ": {
+    "scope": "typst",
+    "prefix": "qf-mcq",
+    "description": "Multiple-choice question (✓ marks the correct option)",
+    "body": [
+      "+ #m(${1:2}) ${2:Question text}?",
+      "  - ✓ ${3:Correct}",
+      "  - ${4:Distractor}",
+      "  - ${5:Distractor}",
+      "  - None of the above",
+      "  #explain[${6:Why, shown only in the key.}]",
+      "$0"
+    ]
+  },
+  "quizforge: multi-select MCQ": {
+    "scope": "typst",
+    "prefix": "qf-multi",
+    "description": "Two or more ✓ options — multi-select is automatic",
+    "body": [
+      "+ #m(${1:2}) ${2:Select all that hold}:",
+      "  - ✓ ${3:Correct A}",
+      "  - ✓ ${4:Correct B}",
+      "  - ${5:Incorrect}",
+      "$0"
+    ]
+  },
+  "quizforge: fill in the blank": {
+    "scope": "typst",
+    "prefix": "qf-fib",
+    "description": "The answer lives in the blank (key + CSV only)",
+    "body": ["+ #m(${1:1}) ${2:The} #blank[${3:answer}] ${4:completes this sentence}.", "$0"]
+  },
+  "quizforge: subjective question": {
+    "scope": "typst",
+    "prefix": "qf-subj",
+    "description": "Answer space on the paper; model answer + rubric in the key",
+    "body": [
+      "+ #m(${1:4}) ${2:Question requiring a worked derivation}.",
+      "  #answer(${3:5cm}, rubric: [${4:+2 setup; +2 conclusion.}])[",
+      "    ${5:Model answer, key only.}]",
+      "$0"
+    ]
+  },
+  "quizforge: booklet-mode question": {
+    "scope": "typst",
+    "prefix": "qf-booklet",
+    "description": "Subjective question with NO space on the paper",
+    "body": [
+      "+ #m(${1:4}) ${2:Question answered separately} (answer in your booklet).",
+      "  #answer(none)[${3:Model answer, key only.}]",
+      "$0"
+    ]
+  },
+  "quizforge: compact-options MCQ": {
+    "scope": "typst",
+    "prefix": "qf-compact",
+    "description": "Options flow inline to save space",
+    "body": [
+      "+ #m(${1:1}) #opts(compact: true) ${2:A question with short options}?",
+      "  - ${3:One}",
+      "  - ✓ ${4:Two}",
+      "  - ${5:Three}",
+      "$0"
+    ]
+  },
+  "quizforge: two-column MCQ": {
+    "scope": "typst",
+    "prefix": "qf-columns",
+    "description": "Short options in two columns",
+    "body": [
+      "+ #m(${1:1}) #opts(columns: 2) ${2:Which direction}?",
+      "  - ✓ ${3:North}",
+      "  - ${4:South}",
+      "  - ${5:East}",
+      "  - ${6:West}",
+      "$0"
+    ]
+  },
+  "quizforge: frozen part": {
+    "scope": "typst",
+    "prefix": "qf-frozen",
+    "description": "Part whose question order is identical in every set",
+    "body": ["= ${1:Long Answers} #section(shuffle: false)", "", "$0"]
+  },
+  "quizforge: bank exam (constructor style)": {
+    "scope": "typst",
+    "prefix": "qf-bank",
+    "description": "Question-bank exam with filtering and fair sampling",
+    "body": [
+      "#import \"@local/quizforge:0.1.0\": *",
+      "",
+      "#let bank = (",
+      "  mcq(\"${1:q-1}\", [${2:Question}?],",
+      "    options: (ans[${3:Correct}], [${4:Wrong}], [${5:Wrong}]),",
+      "    marks: 2, topic: \"${6:topic}\", difficulty: \"${7|easy,medium,hard|}\"),",
+      ")",
+      "",
+      "#make-exam(",
+      "  exam: (id: \"${8:my-exam-1}\", course: \"${9:ES 101}\", title: \"${10:Midsem}\", sets: (\"A\", \"B\")),",
+      "  questions: bank,",
+      "  sections: (",
+      "    (title: \"MCQ\", filter: (type: \"mcq\"), pick: ${11:1}),",
+      "  ),",
+      ")",
+      "$0"
+    ]
+  }
+}

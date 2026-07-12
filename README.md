@@ -27,7 +27,7 @@ quizforge/            the package (Universe-ready: manifest, license, template, 
 exams/                demos: quiz3.typ (ML, figures+tables) · quiz4-ml23.typ (ported real 2023 papers) · quiz2.typ · quiz1.typ (banks)
 questions/            demo banks for the constructor front-end
 scripts/build.py      all sets ∥ → invariant checks → answer_key.csv + manifest.json
-tests/                480 checks: invariant matrix over every exam×set, 24-seed fuzzer, goldens, error contract
+tests/                484 checks: invariant matrix over every exam×set, 24-seed fuzzer, goldens, error contract
 ```
 
 ```bash
@@ -37,7 +37,26 @@ make watch / watch-key [SET=B]      # live preview while authoring
 make install-local                  # use @local/quizforge:0.1.0 from any project
 ```
 
-Requires `typst` ≥ 0.13 and Python 3.10+ (stdlib only, tooling-only).
+Requires `typst` ≥ 0.14 and Python 3.10+ (stdlib only, tooling-only).
+
+## Editor setup (VS Code)
+
+Open the repo in VS Code and install the recommended
+[Tinymist](https://marketplace.visualstudio.com/items?itemName=myriad-dreamin.tinymist)
+extension (`.vscode/extensions.json` suggests it) — you get live preview and
+quizforge's compile-time validation as inline squiggles pointing at the
+offending question. The repo ships:
+
+- **Snippets** — type `qf-` for a full quiz scaffold, MCQs, multi-select,
+  blanks, subjective/booklet questions, compact/two-column options, parts,
+  and a bank-style exam (all snippet bodies are compile-tested in CI).
+- **Tasks** — `⇧⌘B` builds the current exam (all sets + keys + CSV); watch
+  tasks live-preview the paper or the key.
+
+Common mistakes fail compilation with messages that say how to fix them:
+markdown-style `*` options, `____` underscores instead of `#blank[...]`,
+dedented options, a stray `#m(...)` between questions, duplicate questions,
+missing ✓, and ~35 more — see `tests/fixtures/` for the full contract.
 
 ## Guarantees
 

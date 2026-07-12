@@ -1,0 +1,36 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "quizforge: build current exam (all sets + keys + CSV)",
+      "type": "shell",
+      "command": "python3",
+      "args": ["scripts/build.py", "${relativeFile}"],
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "quizforge: watch current exam (student paper, set A)",
+      "type": "shell",
+      "command": "typst",
+      "args": ["watch", "${relativeFile}", "build/preview.pdf", "--root", "${workspaceFolder}", "--input", "set=A", "--input", "mode=exam"],
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "quizforge: watch current exam (answer key)",
+      "type": "shell",
+      "command": "typst",
+      "args": ["watch", "${relativeFile}", "build/preview-key.pdf", "--root", "${workspaceFolder}", "--input", "set=A", "--input", "mode=key"],
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "quizforge: run test suite",
+      "type": "shell",
+      "command": "python3",
+      "args": ["-m", "pytest", "tests", "-q"],
+      "problemMatcher": []
+    }
+  ]
+}
