@@ -250,3 +250,99 @@ def test_csv_survives_commas_and_quotes(tmp_path):
         rows = list(csvmod.DictReader(f))
     answers = {r["answer"] for r in rows}
     assert 'comma, "quotes", and; semicolons' in answers
+
+
+# ------------------------------------------------------------ overflow & floats
+
+def test_overtall_question_breaks_instead_of_overflowing(tmp_path):
+    """A question taller than a full page must flow to the next page — an
+    unbreakable block would silently truncate in print."""
+    opts = "\n".join(
+        f"  - {'✓ ' if i == 0 else ''}Option {i} is stretched with plenty of repeated "
+        "verbiage so that the option wraps across multiple typeset lines and consumes "
+        "real vertical space on the page, again and again, filling the width entirely."
+        for i in range(24)
+    )
+    src = (
+        '#import "/quizforge/lib.typ": *\n'
+        '#show: quiz.with(id: "overtall-test", sets: ("A",))\n'
+        f"+ A question with 24 long options that cannot fit one page?\n{opts}\n"
+    )
+    f = ROOT / "build" / "snippets" / "overtall.typ"
+    f.parent.mkdir(parents=True, exist_ok=True)
+    f.write_text(src)
+    proc = subprocess.run(
+        ["typst", "compile", str(f), str(tmp_path / "p{p}.png"),
+         "--root", str(ROOT), "--format", "png", "--ppi", "40"],
+        cwd=ROOT, capture_output=True, text=True,
+    )
+    assert proc.returncode == 0, proc.stderr
+    assert len(list(tmp_path.glob("p*.png"))) >= 2, "over-tall question did not break across pages"
+
+
+def test_fractional_marks_totals_display_clean():
+    """0.1 + 0.2 must total 0.3, not 0.30000000000000004, on the cover."""
+    src = (
+        '#import "/quizforge/lib.typ": *\n'
+        '#show: quiz.with(id: "float-test", sets: ("A",))\n'
+        "+ #m(0.1) Q one?\n  - ✓ a\n  - b\n"
+        "+ #m(0.2) Q two?\n  - ✓ a\n  - b\n"
+    )
+    f = ROOT / "build" / "snippets" / "float-total.typ"
+    f.parent.mkdir(parents=True, exist_ok=True)
+    f.write_text(src)
+    meta = json.loads(typst_query("A", exam=str(f.relative_to(ROOT))))
+    assert meta["total"] == 0.3
+    assert meta["sections"][0]["marks"] == 0.3
+
+
+# ------------------------------------------------------------ user styling
+
+def test_global_styling_above_quiz_never_changes_realization():
+    """#set/#show rules above `#show: quiz` (fonts, heading styles, even a
+    two-column wrapper) may change looks but must not affect order/answers."""
+    base = (
+        '#import "/quizforge/lib.typ": *\n'
+        '#show: quiz.with(id: "styled-test", sets: ("A", "B"))\n'
+        "= Part\n"
+        "+ #m(2) Styled question one?\n  - ✓ a\n  - b\n  - c\n"
+        "+ #m(1) The answer is #blank[here].\n"
+    )
+    # (a columns(2, ..) wrapper is rejected by typst itself: page/document set
+    # rules cannot live inside containers — future `columns:` param instead)
+    styled = (
+        '#set text(size: 12.5pt)\n'
+        '#show heading: it => text(fill: blue, it)\n'
+        '#show emph: set text(fill: rgb("#333333"))\n'
+    )
+    d = ROOT / "build" / "snippets"
+    d.mkdir(parents=True, exist_ok=True)
+    (d / "unstyled.typ").write_text(base)
+    (d / "styled.typ").write_text(base.replace("#show: quiz", styled + "#show: quiz", 1))
+    plain = typst_query("B", exam="build/snippets/unstyled.typ")
+    fancy = typst_query("B", exam="build/snippets/styled.typ")
+    assert json.loads(plain)["sections"] == json.loads(fancy)["sections"]
+
+
+# ------------------------------------------------------------ odd set ids
+
+def test_unicode_and_odd_set_ids_through_build(tmp_path):
+    src = (
+        '#import "/quizforge/lib.typ": *\n'
+        '#show: quiz.with(id: "odd-sets-test", sets: ("1", "क", "MORNING-A"))\n'
+        "+ Q?\n  - ✓ a\n  - b\n"
+    )
+    f = ROOT / "build" / "snippets" / "odd-sets.typ"
+    f.parent.mkdir(parents=True, exist_ok=True)
+    f.write_text(src)
+    proc = subprocess.run(
+        [sys.executable, "scripts/build.py", str(f.relative_to(ROOT)), "--out", str(tmp_path)],
+        cwd=ROOT, capture_output=True, text=True,
+    )
+    assert proc.returncode == 0, proc.stderr + proc.stdout
+    for s in ("1", "क", "MORNING-A"):
+        assert (tmp_path / "odd-sets-test" / f"set-{s}.pdf").exists()
+    import csv as csvmod
+    with (tmp_path / "odd-sets-test" / "answer_key.csv").open() as fh:
+        rows = list(csvmod.DictReader(fh))
+    assert {r["set"] for r in rows} == {"1", "क", "MORNING-A"}

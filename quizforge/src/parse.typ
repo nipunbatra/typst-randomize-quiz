@@ -322,7 +322,7 @@
         assert(
           false,
           message: "quizforge: found #" + _MARKER-NAMES.at(mk.qf, default: mk.qf)
-            + " between questions — markers belong inside a question's + item",
+            + " outside any question (in instructions or between questions) — markers belong inside a question's + item",
         )
       }
       continue
