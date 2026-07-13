@@ -303,6 +303,7 @@ def main():
     (out / "pdf").mkdir(exist_ok=True)
     (out / "exam").mkdir(exist_ok=True)
     shutil.copy(ROOT / "site" / "index.html", out / "index.html")
+    shutil.copy(ROOT / "site" / "quizforge-demo.mp4", out / "quizforge-demo.mp4")
 
     for exam, blurb in gallery:
         meta = query_meta(exam)
